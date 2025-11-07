@@ -111,14 +111,21 @@ test-integrity: build
 
 # Generate examples
 examples: build
-	@echo "📄 Generating example PDFs..."
-	@echo "  Converting examples/input/*.md..."
-	@PDF_AUTO_OPEN=false bash $(SCRIPT) $(EXAMPLES_DIR)/input/*.md
-	@echo "  Moving PDFs to $(EXAMPLES_DIR)/output/..."
+	@echo "📄 Generating example PDFs with both backends..."
 	@mkdir -p $(EXAMPLES_DIR)/output
-	@mv $(EXAMPLES_DIR)/input/*.pdf $(EXAMPLES_DIR)/output/ 2>/dev/null || true
-	@ls $(EXAMPLES_DIR)/output/*.pdf | while read f; do echo "  ✓ $$(basename $$f)"; done
+	@for md in $(EXAMPLES_DIR)/input/*.md; do \
+		base=$$(basename "$$md" .md); \
+		echo "  Converting $$base.md..."; \
+		PDF_AUTO_OPEN=false bash $(SCRIPT) "$$md" 2>/dev/null; \
+		mv "$(EXAMPLES_DIR)/input/$$base.pdf" "$(EXAMPLES_DIR)/output/$$base-chrome.pdf" 2>/dev/null; \
+		echo "    ✓ $$base-chrome.pdf"; \
+		PDF_BACKEND=tex PDF_AUTO_OPEN=false bash $(SCRIPT) "$$md" 2>/dev/null; \
+		mv "$(EXAMPLES_DIR)/input/$$base.pdf" "$(EXAMPLES_DIR)/output/$$base-latex.pdf" 2>/dev/null; \
+		echo "    ✓ $$base-latex.pdf"; \
+	done
 	@echo "✅ Example PDFs generated in $(EXAMPLES_DIR)/output/"
+	@echo "   Chrome backend: *-chrome.pdf"
+	@echo "   LaTeX backend:  *-latex.pdf"
 
 # Clean generated files
 clean:

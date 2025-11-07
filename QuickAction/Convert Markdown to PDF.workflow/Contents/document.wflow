@@ -18,6 +18,175 @@
 					<key>Container</key>
 					<string>List</string>
 					<key>Optional</key>
+					<false/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.path</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>2.1.1</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Finder</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>itemType</key>
+					<dict/>
+					<key>predicate</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.path</string>
+					</array>
+				</dict>
+				<key>AMRequiredResources</key>
+				<array/>
+				<key>AMSelectedInputType</key>
+				<string>com.apple.cocoa.path</string>
+				<key>AMSelectedOutputType</key>
+				<string>com.apple.cocoa.path</string>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Filter Finder Items 2.action</string>
+				<key>ActionName</key>
+				<string>Filter Finder Items</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>itemType</key>
+					<string>com.apple.cocoa.path</string>
+					<key>predicate</key>
+					<data>
+					YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25Z
+					JGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGG
+					oF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290
+					gAGvEBoLDBMZISssLjU5Pj9CRkpPUFNaYGRp
+					bG1vcVUkbnVsbNMNDg8QERJfEBdOU0NvbXBv
+					dW5kUHJlZGljYXRlVHlwZV8QD05TU3VicHJl
+					ZGljYXRlc1YkY2xhc3MQAYACgBnSFA8VGFpO
+					Uy5vYmplY3RzohYXgAOAFIAY1A8aGxwdHh8g
+					XxARTlNSaWdodEV4cHJlc3Npb25fEBBOU0xl
+					ZnRFeHByZXNzaW9uXxATTlNQcmVkaWNhdGVP
+					cGVyYXRvcoATgA6ABIAR1SIjJCUPJicoKSpZ
+					TlNPcGVyYW5kXk5TU2VsZWN0b3JOYW1lXxAQ
+					TlNFeHByZXNzaW9uVHlwZVtOU0FyZ3VtZW50
+					c4AGgAUQA4AIgA1cdmFsdWVGb3JLZXk60iQP
+					EC2AB9IvMDEyWiRjbGFzc25hbWVYJGNsYXNz
+					ZXNfEBBOU1NlbGZFeHByZXNzaW9uozEzNFxO
+					U0V4cHJlc3Npb25YTlNPYmplY3TSFA82OKE3
+					gAmADNMPJDo7PD1ZTlNLZXlQYXRogAsQCoAK
+					VG5hbWXSLzBAQV8QHE5TS2V5UGF0aFNwZWNp
+					ZmllckV4cHJlc3Npb26jQDM00i8wQ0ReTlNN
+					dXRhYmxlQXJyYXmjQ0U0V05TQXJyYXnSLzBH
+					SF8QE05TS2V5UGF0aEV4cHJlc3Npb26kR0kz
+					NF8QFE5TRnVuY3Rpb25FeHByZXNzaW9u00sk
+					D0xNTl8QD05TQ29uc3RhbnRWYWx1ZYAPEACA
+					EFMubWTSLzBRUl8QGU5TQ29uc3RhbnRWYWx1
+					ZUV4cHJlc3Npb26jUTM01Q9UVVZXWE0oEFla
+					TlNNb2RpZmllcldOU0ZsYWdzWk5TUG9zaXRp
+					b25eTlNPcGVyYXRvclR5cGWAEhAJ0i8wW1xf
+					EBxOU1N1YnN0cmluZ1ByZWRpY2F0ZU9wZXJh
+					dG9ypF1eXzRfEBxOU1N1YnN0cmluZ1ByZWRp
+					Y2F0ZU9wZXJhdG9yXxAZTlNTdHJpbmdQcmVk
+					aWNhdGVPcGVyYXRvcl8QE05TUHJlZGljYXRl
+					T3BlcmF0b3LSLzBhYl8QFU5TQ29tcGFyaXNv
+					blByZWRpY2F0ZaNhYzRbTlNQcmVkaWNhdGXU
+					DxobHB1mH2iAE4AVgASAF9NLJA9qTU6AFoAQ
+					Uy5NRNUPVFVWV1hNKBBZgBLSLzBFcKJFNNIv
+					MHJzXxATTlNDb21wb3VuZFByZWRpY2F0ZaNy
+					YzQACAARABoAJAApADIANwBJAEwAUQBTAHAA
+					dgB9AJcAqQCwALIAtAC2ALsAxgDJAMsAzQDP
+					ANgA7AD/ARUBFwEZARsBHQEoATIBQQFUAWAB
+					YgFkAWYBaAFqAXcBfAF+AYMBjgGXAaoBrgG7
+					AcQByQHLAc0BzwHWAeAB4gHkAeYB6wHwAg8C
+					EwIYAicCKwIzAjgCTgJTAmoCcQKDAoUChwKJ
+					Ao0CkgKuArICvQLIAtAC2wLqAuwC7gLzAxID
+					FwM2A1IDaANtA4UDiQOVA54DoAOiA6QDpgOt
+					A68DsQO1A8ADwgPHA8oDzwPlAAAAAAAAAgEA
+					AAAAAAAAdAAAAAAAAAAAAAAAAAAAA+k=
+					</data>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.Automator.FilterFinderItems2</string>
+				<key>CFBundleVersion</key>
+				<string>2.1.1</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryFilesAndFolders</string>
+				</array>
+				<key>Class Name</key>
+				<string>Filter_Finder_Items_2</string>
+				<key>InputUUID</key>
+				<string>3CD1169A-7BFD-424C-9D73-C2CA25266B3F</string>
+				<key>Keywords</key>
+				<array/>
+				<key>OutputUUID</key>
+				<string>EE7F10AD-ACCB-4460-97E0-2078C11B2FF2</string>
+				<key>UUID</key>
+				<string>6C3C2330-C7D3-4D26-BC2E-3FE381FBD877</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Finder</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<string>com.apple.cocoa.path</string>
+						<key>name</key>
+						<string>itemType</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<data>
+						</data>
+						<key>name</key>
+						<string>predicate</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+				</dict>
+				<key>conversionLabel</key>
+				<integer>0</integer>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>487.500000:328.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Filter Finder Items 2.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
 					<true/>
 					<key>Types</key>
 					<array>
@@ -61,7 +230,7 @@
 					<key>COMMAND_STRING</key>
 					<string>#!/bin/bash
 # md2pdf - Convert Markdown to PDF using Chrome, Typst, or LaTeX
-# https://github.com/yourusername/md2pdf
+# https://github.com/manwithacat/md2pdf
 export PATH=&quot;/opt/homebrew/bin:/usr/local/bin:/Library/TeX/texbin:/usr/bin:/bin:/usr/sbin:/sbin&quot;
 
 # Configuration - can be overridden by environment variables
@@ -128,40 +297,69 @@ convert_chrome() {
   # Create temporary HTML with GitHub-style CSS
   local html_file=$(mktemp).html
 
-  pandoc &quot;$md_file&quot; -t html -s \
-    --metadata title=&quot;$(basename &quot;$md_file&quot; .md)&quot; \
-    --css=&lt;(cat &lt;&lt;'CSS_STYLES'
-&lt;style&gt;
+  # Create temporary CSS files
+  local css_file=$(mktemp).css
+  local highlight_file=$(mktemp)-highlight.css
+
+  # Generate Pandoc's syntax highlighting CSS
+  pandoc --print-highlight-style=pygments &gt; &quot;$highlight_file&quot; 2&gt;/dev/null
+  cat &gt; &quot;$css_file&quot; &lt;&lt; 'CSS_STYLES'
+* {
+  font-family: Helvetica, Arial, sans-serif !important;
+}
+
 body {
   max-width: 800px;
   margin: 2cm auto;
   padding: 0 1cm;
-  font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif;
-  font-size: 11pt;
-  line-height: 1.6;
+  font-family: Helvetica, Arial, sans-serif !important;
+  font-size: 9pt;
+  line-height: 1.2;
   color: #24292e;
 }
 
+/* Remove top margin from body's first child */
+body &gt; :first-child {
+  margin-top: 0 !important;
+}
+
+/* === HEADING STYLES === */
+/* All headings: margin-top=16px, margin-bottom=8px */
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 24px;
-  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-bottom: 8px;
   font-weight: 600;
   line-height: 1.25;
 }
 
-h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+/* First heading: margin-top=0 */
+h1:first-child, h2:first-child, h3:first-child {
+  margin-top: 0;
+}
+
+/* H1: font-size=2em (18pt @ 9pt body) */
+h1 { font-size: 2em; }
+
+/* H2: font-size=1.5em (13.5pt @ 9pt body) */
+h2 { font-size: 1.5em; }
+
+/* H3: font-size=1.25em (11.25pt @ 9pt body) */
 h3 { font-size: 1.25em; }
 
+/* === CODE STYLES === */
+/* Inline code: background=#f6f8fa, padding=0.2em/0.4em, font-size=85% */
 code {
   background-color: #f6f8fa;
   padding: 0.2em 0.4em;
   margin: 0;
   font-size: 85%;
   border-radius: 3px;
-  font-family: &quot;SF Mono&quot;, Monaco, Menlo, Consolas, monospace;
+  font-family: &quot;SF Mono&quot;, Monaco, Menlo, Consolas, monospace !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
+/* Code blocks: background=#f6f8fa, padding=16px, font-size=85% */
 pre {
   background-color: #f6f8fa;
   padding: 16px;
@@ -169,11 +367,16 @@ pre {
   font-size: 85%;
   line-height: 1.45;
   border-radius: 3px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
+/* Code inside pre: transparent background */
 pre code {
   background-color: transparent;
   padding: 0;
+  font-family: &quot;SF Mono&quot;, Monaco, Menlo, Consolas, monospace !important;
+  color: #24292e;
 }
 
 blockquote {
@@ -183,27 +386,52 @@ blockquote {
   margin: 0;
 }
 
+/* === TABLE STYLES === */
+/* Table: width=100%, booktabs-style borders, alternating rows */
 table {
   border-collapse: collapse;
   width: 100%;
   margin: 16px 0;
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
 }
 
+/* Table header: border-bottom=1px */
+table thead {
+  border-bottom: 1px solid #000;
+}
+
+/* Table cells: padding=6px/13px, no borders */
 table th, table td {
   padding: 6px 13px;
-  border: 1px solid #dfe2e5;
+  border: none;
+  text-align: left;
 }
 
+/* Header cells: font-weight=600, border-bottom=1px */
 table th {
   font-weight: 600;
-  background-color: #f6f8fa;
+  background-color: transparent;
+  border-bottom: 1px solid #000;
 }
 
+/* Table rows: white background by default */
 table tr {
   background-color: #fff;
-  border-top: 1px solid #c6cbd1;
+  border: none;
 }
 
+/* Body rows: light border between rows */
+table tbody tr {
+  border-bottom: 1px solid #dfe2e5;
+}
+
+/* Last row: no bottom border */
+table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Alternating rows: light gray background */
 table tr:nth-child(2n) {
   background-color: #f6f8fa;
 }
@@ -226,23 +454,92 @@ li + li {
 }
 
 @media print {
+  @page {
+    margin: 2cm 1.5cm;
+    @bottom-center {
+      content: counter(page);
+      font-size: 9pt;
+      color: #666;
+    }
+  }
+
   body {
     margin: 0;
     padding: 1cm;
     max-width: none;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  /* Preserve code block backgrounds in print */
+  pre, code {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Strong protection for top-level headers */
+  h1, h2 {
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: avoid-page !important;
+    break-inside: avoid-page !important;
+    min-height: 2em;
+    padding-bottom: 0.5em;
+  }
+
+  /* Force minimum content after h1/h2 before allowing page break */
+  h1::after, h2::after {
+    content: &quot;&quot;;
+    display: block;
+    height: 3em;
+    margin-bottom: -3em;
+  }
+
+  /* Keep h1/h2 headers with their immediate following content */
+  h1 + *, h2 + * {
+    page-break-before: avoid !important;
+    break-before: avoid-page !important;
+    margin-top: 0;
+  }
+
+  /* Keep h1/h2 with following paragraph */
+  h1 + p, h2 + p {
+    page-break-before: avoid !important;
+    break-before: avoid-page !important;
+    min-height: 3em;
+  }
+
+  /* Standard protection for lower-level headers */
+  h3, h4, h5, h6 {
     page-break-after: avoid;
   }
 
+  /* Prevent breaking inside these elements */
   table, pre, blockquote {
     page-break-inside: avoid;
   }
+
+  /* Additional protection for code blocks */
+  pre code {
+    page-break-inside: avoid;
+  }
 }
-&lt;/style&gt;
 CSS_STYLES
-) -o &quot;$html_file&quot; 2&gt;/dev/null
+
+  # Add print-color-adjust to highlight styles
+  cat &gt;&gt; &quot;$highlight_file&quot; &lt;&lt; 'HIGHLIGHT_ADJUST'
+
+/* Force syntax highlighting colors in print/PDF */
+.sourceCode, pre.sourceCode, code.sourceCode {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+HIGHLIGHT_ADJUST
+
+  pandoc &quot;$md_file&quot; -t html -s \
+    --css=&quot;$highlight_file&quot; \
+    --css=&quot;$css_file&quot; \
+    -o &quot;$html_file&quot; 2&gt;/dev/null
 
   if [ $? -eq 0 ]; then
     # Generate PDF with Chrome headless
@@ -252,10 +549,10 @@ CSS_STYLES
       --virtual-time-budget=10000 \
       --print-to-pdf=&quot;$pdf_file&quot; &quot;file://$html_file&quot; 2&gt;/dev/null
     local result=$?
-    rm &quot;$html_file&quot;
+    rm &quot;$html_file&quot; &quot;$css_file&quot; &quot;$highlight_file&quot;
     return $result
   else
-    rm &quot;$html_file&quot;
+    rm &quot;$html_file&quot; &quot;$css_file&quot; &quot;$highlight_file&quot;
     return 1
   fi
 }
@@ -289,11 +586,17 @@ convert_tex() {
   # Create temporary header file for LaTeX table styling
   local header_file=$(mktemp)
   cat &gt; &quot;$header_file&quot; &lt;&lt; 'LATEX_HEADER'
+% Widow and orphan control
+\widowpenalty=10000         % Prevent widows (single lines at top of page)
+\clubpenalty=10000          % Prevent orphans (single lines at bottom of page)
+\raggedbottom               % Allow uneven page bottoms to avoid bad breaks
+
 % Better table formatting with smart column widths
 \usepackage{booktabs}       % Professional table lines
 \usepackage{longtable}      % Multi-page tables
 \usepackage{array}          % Enhanced column formatting
 \usepackage{calc}           % Calculations for column widths
+\usepackage{tabularx}       % Auto-width tables
 
 % Unicode and emoji support via fontspec (XeLaTeX)
 \usepackage{fontspec}
@@ -302,7 +605,7 @@ convert_tex() {
 % Emoji support (requires: sudo tlmgr install newunicodechar)
 \IfFileExists{newunicodechar.sty}{
   \usepackage{newunicodechar}
-  % Map emojis to Unicode symbols that work with Helvetica Neue
+  % Map emojis to text symbols that work with Helvetica Neue
   \newunicodechar{✅}{✓}
   \newunicodechar{💰}{[\$]}
   \newunicodechar{📊}{[≡]}
@@ -315,13 +618,30 @@ convert_tex() {
   \newunicodechar{🔄}{[↻]}
   \newunicodechar{⏳}{[⧗]}
   \newunicodechar{❌}{[✗]}
+  \newunicodechar{💬}{[...]}
+  \newunicodechar{📋}{[☰]}
+  \newunicodechar{🔍}{[🔍]}
+  \newunicodechar{📖}{[≡]}
+  \newunicodechar{🎨}{[≈]}
+  \newunicodechar{📌}{[!]}
+  \newunicodechar{⚠}{[!]}
+  \newunicodechar{📏}{[―]}
+  \newunicodechar{📚}{[≡≡]}
+  \newunicodechar{🎯}{[◎]}
+  \newunicodechar{✔}{✓}
 }{
   % Fallback: emojis will show as empty boxes if newunicodechar not installed
 }
 
-% Make tables use smaller font (8pt instead of 10pt body text)
+% Make tables use smaller font and full width
 \usepackage{etoolbox}
-\AtBeginEnvironment{longtable}{\small\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}}
+\AtBeginEnvironment{longtable}{%
+  \small%
+  \setlength{\LTleft}{0pt}%
+  \setlength{\LTright}{0pt}%
+  \setlength{\LTpre}{0pt}%
+  \setlength{\LTpost}{0pt}%
+}
 \AtBeginEnvironment{tabular}{\small}
 
 % Improve table spacing - reduced column padding for more space
@@ -334,13 +654,13 @@ convert_tex() {
 \newcolumntype{C}[1]{&gt;{\Centering\arraybackslash}p{#1}}
 \newcolumntype{R}[1]{&gt;{\RaggedLeft\arraybackslash}p{#1}}
 
-% Prevent tables from overflowing page width
+% Prevent tables from overflowing page width and make them full width
+\setlength\LTleft{0pt}
+\setlength\LTright{\fill}
+
+% Force longtables to use full text width
 \setlength\LTleft{0pt}
 \setlength\LTright{0pt}
-
-% Auto-adjust table width to text width
-\setlength\LTleft{0pt minus 1fill}
-\setlength\LTright{0pt minus 1fill}
 LATEX_HEADER
 
   pandoc -s &quot;$md_file&quot; \
@@ -618,7 +938,15 @@ fi</string>
 		</dict>
 	</array>
 	<key>connectors</key>
-	<dict/>
+	<dict>
+		<key>7786B52C-8990-4645-BB2D-A5224C2A948A</key>
+		<dict>
+			<key>from</key>
+			<string>6C3C2330-C7D3-4D26-BC2E-3FE381FBD877 - 6C3C2330-C7D3-4D26-BC2E-3FE381FBD877</string>
+			<key>to</key>
+			<string>AFB905D0-4FB8-4394-90BF-390197196888 - AFB905D0-4FB8-4394-90BF-390197196888</string>
+		</dict>
+	</dict>
 	<key>workflowMetaData</key>
 	<dict>
 		<key>applicationBundleID</key>
@@ -634,6 +962,94 @@ fi</string>
 		<array>
 			<string>/System/Library/CoreServices/Finder.app</string>
 		</array>
+		<key>backgroundColor</key>
+		<data>
+		YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9i
+		amVjdHMSAAGGoF8QD05TS2V5ZWRBcmNoaXZlctEICVRyb290gAGpCwwXGBkk
+		KisyVSRudWxs1Q0ODxAREhMUFRZWJGNsYXNzW05TQ29sb3JOYW1lXE5TQ29s
+		b3JTcGFjZV1OU0NhdGFsb2dOYW1lV05TQ29sb3KACIADEAaAAoAEVlN5c3Rl
+		bV8QEHN5c3RlbUJyb3duQ29sb3LWDRobDxwdEh8gISIjXE5TQ29tcG9uZW50
+		c1VOU1JHQl8QEk5TQ3VzdG9tQ29sb3JTcGFjZV8QEE5TTGluZWFyRXhwb3N1
+		cmWACE0wLjYgMC40IDAuMiAxTxAnMC41MjU1MTg4OTQyIDAuMzI1NDM1MzQw
+		NCAwLjE1MjE2MjE2NDQAEAGABUEx0yUmDScoKVROU0lEVU5TSUNDEAeABoAH
+		TxEMSAAADEhMaW5vAhAAAG1udHJSR0IgWFlaIAfOAAIACQAGADEAAGFjc3BN
+		U0ZUAAAAAElFQyBzUkdCAAAAAAAAAAAAAAAAAAD21gABAAAAANMtSFAgIAAA
+		AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+		EWNwcnQAAAFQAAAAM2Rlc2MAAAGEAAAAbHd0cHQAAAHwAAAAFGJrcHQAAAIE
+		AAAAFHJYWVoAAAIYAAAAFGdYWVoAAAIsAAAAFGJYWVoAAAJAAAAAFGRtbmQA
+		AAJUAAAAcGRtZGQAAALEAAAAiHZ1ZWQAAANMAAAAhnZpZXcAAAPUAAAAJGx1
+		bWkAAAP4AAAAFG1lYXMAAAQMAAAAJHRlY2gAAAQwAAAADHJUUkMAAAQ8AAAI
+		DGdUUkMAAAQ8AAAIDGJUUkMAAAQ8AAAIDHRleHQAAAAAQ29weXJpZ2h0IChj
+		KSAxOTk4IEhld2xldHQtUGFja2FyZCBDb21wYW55AABkZXNjAAAAAAAAABJz
+		UkdCIElFQzYxOTY2LTIuMQAAAAAAAAAAAAAAEnNSR0IgSUVDNjE5NjYtMi4x
+		AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+		AAAAAABYWVogAAAAAAAA81EAAQAAAAEWzFhZWiAAAAAAAAAAAAAAAAAAAAAA
+		WFlaIAAAAAAAAG+iAAA49QAAA5BYWVogAAAAAAAAYpkAALeFAAAY2lhZWiAA
+		AAAAAAAkoAAAD4QAALbPZGVzYwAAAAAAAAAWSUVDIGh0dHA6Ly93d3cuaWVj
+		LmNoAAAAAAAAAAAAAAAWSUVDIGh0dHA6Ly93d3cuaWVjLmNoAAAAAAAAAAAA
+		AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGRlc2MAAAAA
+		AAAALklFQyA2MTk2Ni0yLjEgRGVmYXVsdCBSR0IgY29sb3VyIHNwYWNlIC0g
+		c1JHQgAAAAAAAAAAAAAALklFQyA2MTk2Ni0yLjEgRGVmYXVsdCBSR0IgY29s
+		b3VyIHNwYWNlIC0gc1JHQgAAAAAAAAAAAAAAAAAAAAAAAAAAAABkZXNjAAAA
+		AAAAACxSZWZlcmVuY2UgVmlld2luZyBDb25kaXRpb24gaW4gSUVDNjE5NjYt
+		Mi4xAAAAAAAAAAAAAAAsUmVmZXJlbmNlIFZpZXdpbmcgQ29uZGl0aW9uIGlu
+		IElFQzYxOTY2LTIuMQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdmlldwAA
+		AAAAE6T+ABRfLgAQzxQAA+3MAAQTCwADXJ4AAAABWFlaIAAAAAAATAlWAFAA
+		AABXH+dtZWFzAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAACjwAAAAJzaWcg
+		AAAAAENSVCBjdXJ2AAAAAAAABAAAAAAFAAoADwAUABkAHgAjACgALQAyADcA
+		OwBAAEUASgBPAFQAWQBeAGMAaABtAHIAdwB8AIEAhgCLAJAAlQCaAJ8ApACp
+		AK4AsgC3ALwAwQDGAMsA0ADVANsA4ADlAOsA8AD2APsBAQEHAQ0BEwEZAR8B
+		JQErATIBOAE+AUUBTAFSAVkBYAFnAW4BdQF8AYMBiwGSAZoBoQGpAbEBuQHB
+		AckB0QHZAeEB6QHyAfoCAwIMAhQCHQImAi8COAJBAksCVAJdAmcCcQJ6AoQC
+		jgKYAqICrAK2AsECywLVAuAC6wL1AwADCwMWAyEDLQM4A0MDTwNaA2YDcgN+
+		A4oDlgOiA64DugPHA9MD4APsA/kEBgQTBCAELQQ7BEgEVQRjBHEEfgSMBJoE
+		qAS2BMQE0wThBPAE/gUNBRwFKwU6BUkFWAVnBXcFhgWWBaYFtQXFBdUF5QX2
+		BgYGFgYnBjcGSAZZBmoGewaMBp0GrwbABtEG4wb1BwcHGQcrBz0HTwdhB3QH
+		hgeZB6wHvwfSB+UH+AgLCB8IMghGCFoIbgiCCJYIqgi+CNII5wj7CRAJJQk6
+		CU8JZAl5CY8JpAm6Cc8J5Qn7ChEKJwo9ClQKagqBCpgKrgrFCtwK8wsLCyIL
+		OQtRC2kLgAuYC7ALyAvhC/kMEgwqDEMMXAx1DI4MpwzADNkM8w0NDSYNQA1a
+		DXQNjg2pDcMN3g34DhMOLg5JDmQOfw6bDrYO0g7uDwkPJQ9BD14Peg+WD7MP
+		zw/sEAkQJhBDEGEQfhCbELkQ1xD1ERMRMRFPEW0RjBGqEckR6BIHEiYSRRJk
+		EoQSoxLDEuMTAxMjE0MTYxODE6QTxRPlFAYUJxRJFGoUixStFM4U8BUSFTQV
+		VhV4FZsVvRXgFgMWJhZJFmwWjxayFtYW+hcdF0EXZReJF64X0hf3GBsYQBhl
+		GIoYrxjVGPoZIBlFGWsZkRm3Gd0aBBoqGlEadxqeGsUa7BsUGzsbYxuKG7Ib
+		2hwCHCocUhx7HKMczBz1HR4dRx1wHZkdwx3sHhYeQB5qHpQevh7pHxMfPh9p
+		H5Qfvx/qIBUgQSBsIJggxCDwIRwhSCF1IaEhziH7IiciVSKCIq8i3SMKIzgj
+		ZiOUI8Ij8CQfJE0kfCSrJNolCSU4JWgllyXHJfcmJyZXJocmtyboJxgnSSd6
+		J6sn3CgNKD8ocSiiKNQpBik4KWspnSnQKgIqNSpoKpsqzysCKzYraSudK9Es
+		BSw5LG4soizXLQwtQS12Last4S4WLkwugi63Lu4vJC9aL5Evxy/+MDUwbDCk
+		MNsxEjFKMYIxujHyMioyYzKbMtQzDTNGM38zuDPxNCs0ZTSeNNg1EzVNNYc1
+		wjX9Njc2cjauNuk3JDdgN5w31zgUOFA4jDjIOQU5Qjl/Obw5+To2OnQ6sjrv
+		Oy07azuqO+g8JzxlPKQ84z0iPWE9oT3gPiA+YD6gPuA/IT9hP6I/4kAjQGRA
+		pkDnQSlBakGsQe5CMEJyQrVC90M6Q31DwEQDREdEikTORRJFVUWaRd5GIkZn
+		RqtG8Ec1R3tHwEgFSEtIkUjXSR1JY0mpSfBKN0p9SsRLDEtTS5pL4kwqTHJM
+		uk0CTUpNk03cTiVObk63TwBPSU+TT91QJ1BxULtRBlFQUZtR5lIxUnxSx1MT
+		U19TqlP2VEJUj1TbVShVdVXCVg9WXFapVvdXRFeSV+BYL1h9WMtZGllpWbha
+		B1pWWqZa9VtFW5Vb5Vw1XIZc1l0nXXhdyV4aXmxevV8PX2Ffs2AFYFdgqmD8
+		YU9homH1YklinGLwY0Njl2PrZEBklGTpZT1lkmXnZj1mkmboZz1nk2fpaD9o
+		lmjsaUNpmmnxakhqn2r3a09rp2v/bFdsr20IbWBtuW4SbmtuxG8eb3hv0XAr
+		cIZw4HE6cZVx8HJLcqZzAXNdc7h0FHRwdMx1KHWFdeF2Pnabdvh3VnezeBF4
+		bnjMeSp5iXnnekZ6pXsEe2N7wnwhfIF84X1BfaF+AX5ifsJ/I3+Ef+WAR4Co
+		gQqBa4HNgjCCkoL0g1eDuoQdhICE44VHhauGDoZyhteHO4efiASIaYjOiTOJ
+		mYn+imSKyoswi5aL/IxjjMqNMY2Yjf+OZo7OjzaPnpAGkG6Q1pE/kaiSEZJ6
+		kuOTTZO2lCCUipT0lV+VyZY0lp+XCpd1l+CYTJi4mSSZkJn8mmia1ZtCm6+c
+		HJyJnPedZJ3SnkCerp8dn4uf+qBpoNihR6G2oiailqMGo3aj5qRWpMelOKWp
+		phqmi6b9p26n4KhSqMSpN6mpqhyqj6sCq3Wr6axcrNCtRK24ri2uoa8Wr4uw
+		ALB1sOqxYLHWskuywrM4s660JbSctRO1irYBtnm28Ldot+C4WbjRuUq5wro7
+		urW7LrunvCG8m70VvY++Cr6Evv+/er/1wHDA7MFnwePCX8Lbw1jD1MRRxM7F
+		S8XIxkbGw8dBx7/IPci8yTrJuco4yrfLNsu2zDXMtc01zbXONs62zzfPuNA5
+		0LrRPNG+0j/SwdNE08bUSdTL1U7V0dZV1tjXXNfg2GTY6Nls2fHadtr724Dc
+		BdyK3RDdlt4c3qLfKd+v4DbgveFE4cziU+Lb42Pj6+Rz5PzlhOYN5pbnH+ep
+		6DLovOlG6dDqW+rl63Dr++yG7RHtnO4o7rTvQO/M8Fjw5fFy8f/yjPMZ86f0
+		NPTC9VD13vZt9vv3ivgZ+Kj5OPnH+lf65/t3/Af8mP0p/br+S/7c/23//9Is
+		LS4vWiRjbGFzc25hbWVYJGNsYXNzZXNcTlNDb2xvclNwYWNlojAxXE5TQ29s
+		b3JTcGFjZVhOU09iamVjdNIsLTM0V05TQ29sb3KiMzEACAARABoAJAApADIA
+		NwBJAEwAUQBTAF0AYwBuAHUAgQCOAJwApACmAKgAqgCsAK4AtQDIANUA4gDo
+		AP0BEAESASABSgFMAU4BUAFXAVwBYgFkAWYBaA20DbkNxA3NDdoN3Q3qDfMN
+		+A4AAAAAAAAAAgEAAAAAAAAANQAAAAAAAAAAAAAAAAAADgM=
+		</data>
+		<key>backgroundColorName</key>
+		<string>systemBrownColor</string>
 		<key>inputTypeIdentifier</key>
 		<string>com.apple.Automator.fileSystemObject</string>
 		<key>outputTypeIdentifier</key>
@@ -653,7 +1069,7 @@ fi</string>
 		<key>serviceProcessesInput</key>
 		<false/>
 		<key>systemImageName</key>
-		<string>NSActionTemplate</string>
+		<string>NSTouchBarAllMyFiles</string>
 		<key>useAutomaticInputType</key>
 		<false/>
 		<key>workflowTypeIdentifier</key>

@@ -67,40 +67,69 @@ convert_chrome() {
   # Create temporary HTML with GitHub-style CSS
   local html_file=$(mktemp).html
 
-  pandoc "$md_file" -t html -s \
-    --metadata title="$(basename "$md_file" .md)" \
-    --css=<(cat <<'CSS_STYLES'
-<style>
+  # Create temporary CSS files
+  local css_file=$(mktemp).css
+  local highlight_file=$(mktemp)-highlight.css
+
+  # Generate Pandoc's syntax highlighting CSS
+  pandoc --print-highlight-style=pygments > "$highlight_file" 2>/dev/null
+  cat > "$css_file" << 'CSS_STYLES'
+* {
+  font-family: Helvetica, Arial, sans-serif !important;
+}
+
 body {
   max-width: 800px;
   margin: 2cm auto;
   padding: 0 1cm;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-  font-size: 11pt;
-  line-height: 1.6;
+  font-family: Helvetica, Arial, sans-serif !important;
+  font-size: 9pt;
+  line-height: 1.2;
   color: #24292e;
 }
 
+/* Remove top margin from body's first child */
+body > :first-child {
+  margin-top: 0 !important;
+}
+
+/* === HEADING STYLES === */
+/* All headings: margin-top=16px, margin-bottom=8px */
 h1, h2, h3, h4, h5, h6 {
-  margin-top: 24px;
-  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-bottom: 8px;
   font-weight: 600;
   line-height: 1.25;
 }
 
-h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
-h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+/* First heading: margin-top=0 */
+h1:first-child, h2:first-child, h3:first-child {
+  margin-top: 0;
+}
+
+/* H1: font-size=2em (18pt @ 9pt body) */
+h1 { font-size: 2em; }
+
+/* H2: font-size=1.5em (13.5pt @ 9pt body) */
+h2 { font-size: 1.5em; }
+
+/* H3: font-size=1.25em (11.25pt @ 9pt body) */
 h3 { font-size: 1.25em; }
 
+/* === CODE STYLES === */
+/* Inline code: background=#f6f8fa, padding=0.2em/0.4em, font-size=85% */
 code {
   background-color: #f6f8fa;
   padding: 0.2em 0.4em;
   margin: 0;
   font-size: 85%;
   border-radius: 3px;
-  font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
+  font-family: "SF Mono", Monaco, Menlo, Consolas, monospace !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
+/* Code blocks: background=#f6f8fa, padding=16px, font-size=85% */
 pre {
   background-color: #f6f8fa;
   padding: 16px;
@@ -108,11 +137,16 @@ pre {
   font-size: 85%;
   line-height: 1.45;
   border-radius: 3px;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
 
+/* Code inside pre: transparent background */
 pre code {
   background-color: transparent;
   padding: 0;
+  font-family: "SF Mono", Monaco, Menlo, Consolas, monospace !important;
+  color: #24292e;
 }
 
 blockquote {
@@ -122,27 +156,52 @@ blockquote {
   margin: 0;
 }
 
+/* === TABLE STYLES === */
+/* Table: width=100%, booktabs-style borders, alternating rows */
 table {
   border-collapse: collapse;
   width: 100%;
   margin: 16px 0;
+  border-top: 2px solid #000;
+  border-bottom: 2px solid #000;
 }
 
+/* Table header: border-bottom=1px */
+table thead {
+  border-bottom: 1px solid #000;
+}
+
+/* Table cells: padding=6px/13px, no borders */
 table th, table td {
   padding: 6px 13px;
-  border: 1px solid #dfe2e5;
+  border: none;
+  text-align: left;
 }
 
+/* Header cells: font-weight=600, border-bottom=1px */
 table th {
   font-weight: 600;
-  background-color: #f6f8fa;
+  background-color: transparent;
+  border-bottom: 1px solid #000;
 }
 
+/* Table rows: white background by default */
 table tr {
   background-color: #fff;
-  border-top: 1px solid #c6cbd1;
+  border: none;
 }
 
+/* Body rows: light border between rows */
+table tbody tr {
+  border-bottom: 1px solid #dfe2e5;
+}
+
+/* Last row: no bottom border */
+table tbody tr:last-child {
+  border-bottom: none;
+}
+
+/* Alternating rows: light gray background */
 table tr:nth-child(2n) {
   background-color: #f6f8fa;
 }
@@ -165,23 +224,92 @@ li + li {
 }
 
 @media print {
+  @page {
+    margin: 2cm 1.5cm;
+    @bottom-center {
+      content: counter(page);
+      font-size: 9pt;
+      color: #666;
+    }
+  }
+
   body {
     margin: 0;
     padding: 1cm;
     max-width: none;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  /* Preserve code block backgrounds in print */
+  pre, code {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
+  /* Strong protection for top-level headers */
+  h1, h2 {
+    page-break-after: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: avoid-page !important;
+    break-inside: avoid-page !important;
+    min-height: 2em;
+    padding-bottom: 0.5em;
+  }
+
+  /* Force minimum content after h1/h2 before allowing page break */
+  h1::after, h2::after {
+    content: "";
+    display: block;
+    height: 3em;
+    margin-bottom: -3em;
+  }
+
+  /* Keep h1/h2 headers with their immediate following content */
+  h1 + *, h2 + * {
+    page-break-before: avoid !important;
+    break-before: avoid-page !important;
+    margin-top: 0;
+  }
+
+  /* Keep h1/h2 with following paragraph */
+  h1 + p, h2 + p {
+    page-break-before: avoid !important;
+    break-before: avoid-page !important;
+    min-height: 3em;
+  }
+
+  /* Standard protection for lower-level headers */
+  h3, h4, h5, h6 {
     page-break-after: avoid;
   }
 
+  /* Prevent breaking inside these elements */
   table, pre, blockquote {
     page-break-inside: avoid;
   }
+
+  /* Additional protection for code blocks */
+  pre code {
+    page-break-inside: avoid;
+  }
 }
-</style>
 CSS_STYLES
-) -o "$html_file" 2>/dev/null
+
+  # Add print-color-adjust to highlight styles
+  cat >> "$highlight_file" << 'HIGHLIGHT_ADJUST'
+
+/* Force syntax highlighting colors in print/PDF */
+.sourceCode, pre.sourceCode, code.sourceCode {
+  -webkit-print-color-adjust: exact !important;
+  print-color-adjust: exact !important;
+  color-adjust: exact !important;
+}
+HIGHLIGHT_ADJUST
+
+  pandoc "$md_file" -t html -s \
+    --css="$highlight_file" \
+    --css="$css_file" \
+    -o "$html_file" 2>/dev/null
 
   if [ $? -eq 0 ]; then
     # Generate PDF with Chrome headless
@@ -191,10 +319,10 @@ CSS_STYLES
       --virtual-time-budget=10000 \
       --print-to-pdf="$pdf_file" "file://$html_file" 2>/dev/null
     local result=$?
-    rm "$html_file"
+    rm "$html_file" "$css_file" "$highlight_file"
     return $result
   else
-    rm "$html_file"
+    rm "$html_file" "$css_file" "$highlight_file"
     return 1
   fi
 }
@@ -228,11 +356,17 @@ convert_tex() {
   # Create temporary header file for LaTeX table styling
   local header_file=$(mktemp)
   cat > "$header_file" << 'LATEX_HEADER'
+% Widow and orphan control
+\widowpenalty=10000         % Prevent widows (single lines at top of page)
+\clubpenalty=10000          % Prevent orphans (single lines at bottom of page)
+\raggedbottom               % Allow uneven page bottoms to avoid bad breaks
+
 % Better table formatting with smart column widths
 \usepackage{booktabs}       % Professional table lines
 \usepackage{longtable}      % Multi-page tables
 \usepackage{array}          % Enhanced column formatting
 \usepackage{calc}           % Calculations for column widths
+\usepackage{tabularx}       % Auto-width tables
 
 % Unicode and emoji support via fontspec (XeLaTeX)
 \usepackage{fontspec}
@@ -241,7 +375,7 @@ convert_tex() {
 % Emoji support (requires: sudo tlmgr install newunicodechar)
 \IfFileExists{newunicodechar.sty}{
   \usepackage{newunicodechar}
-  % Map emojis to Unicode symbols that work with Helvetica Neue
+  % Map emojis to text symbols that work with Helvetica Neue
   \newunicodechar{✅}{✓}
   \newunicodechar{💰}{[\$]}
   \newunicodechar{📊}{[≡]}
@@ -254,13 +388,30 @@ convert_tex() {
   \newunicodechar{🔄}{[↻]}
   \newunicodechar{⏳}{[⧗]}
   \newunicodechar{❌}{[✗]}
+  \newunicodechar{💬}{[...]}
+  \newunicodechar{📋}{[☰]}
+  \newunicodechar{🔍}{[🔍]}
+  \newunicodechar{📖}{[≡]}
+  \newunicodechar{🎨}{[≈]}
+  \newunicodechar{📌}{[!]}
+  \newunicodechar{⚠}{[!]}
+  \newunicodechar{📏}{[―]}
+  \newunicodechar{📚}{[≡≡]}
+  \newunicodechar{🎯}{[◎]}
+  \newunicodechar{✔}{✓}
 }{
   % Fallback: emojis will show as empty boxes if newunicodechar not installed
 }
 
-% Make tables use smaller font (8pt instead of 10pt body text)
+% Make tables use smaller font and full width
 \usepackage{etoolbox}
-\AtBeginEnvironment{longtable}{\small\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}}
+\AtBeginEnvironment{longtable}{%
+  \small%
+  \setlength{\LTleft}{0pt}%
+  \setlength{\LTright}{0pt}%
+  \setlength{\LTpre}{0pt}%
+  \setlength{\LTpost}{0pt}%
+}
 \AtBeginEnvironment{tabular}{\small}
 
 % Improve table spacing - reduced column padding for more space
@@ -273,13 +424,13 @@ convert_tex() {
 \newcolumntype{C}[1]{>{\Centering\arraybackslash}p{#1}}
 \newcolumntype{R}[1]{>{\RaggedLeft\arraybackslash}p{#1}}
 
-% Prevent tables from overflowing page width
+% Prevent tables from overflowing page width and make them full width
+\setlength\LTleft{0pt}
+\setlength\LTright{\fill}
+
+% Force longtables to use full text width
 \setlength\LTleft{0pt}
 \setlength\LTright{0pt}
-
-% Auto-adjust table width to text width
-\setlength\LTleft{0pt minus 1fill}
-\setlength\LTright{0pt minus 1fill}
 LATEX_HEADER
 
   pandoc -s "$md_file" \

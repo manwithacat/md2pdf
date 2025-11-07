@@ -5,9 +5,30 @@
 [![Backends](https://img.shields.io/badge/backends-Chrome%20%7C%20Typst%20%7C%20LaTeX-blue.svg)](README.md)
 [![Tests](https://img.shields.io/badge/tests-16%20passing-success.svg)](tests/)
 
+**📦 [Download Latest Release](https://github.com/manwithacat/md2pdf/releases/latest)** • Ready-to-install Quick Action bundle
+
 Convert Markdown to beautiful PDFs on macOS with **zero TeX setup required**! Uses Chrome/Chromium headless for instant PDF generation with native color emoji support 🎨 and GitHub-style formatting. Seamless Finder integration via Quick Actions.
 
 Intelligent multi-backend system: **Chrome** (default, zero setup) → **Typst** (optional, modern) → **XeLaTeX** (fallback for academic/math). Perfect for technical documentation, meeting notes, project READMEs, or any Markdown content.
+
+### 🎯 Project Scope
+
+**md2pdf is designed for quick, good-looking PDF generation** - not detailed typesetting control. Think "easy sharing" rather than "academic publishing". While the tool produces professional-quality output with syntax highlighting, tables, and proper formatting, it prioritizes convenience and speed over fine-grained typographic control.
+
+**What it does well:**
+- ✅ Quick conversion of Markdown to shareable PDFs
+- ✅ Consistent, GitHub-style formatting
+- ✅ Full emoji and Unicode support
+- ✅ Syntax-highlighted code blocks
+- ✅ Professional tables with alternating row colors
+
+**What it doesn't do:**
+- ❌ Fine-grained margin/spacing control per element
+- ❌ Custom page layouts or multi-column designs
+- ❌ Advanced typography (ligatures, kerning adjustments)
+- ❌ Publisher-ready academic papers (use LaTeX directly for that)
+
+For precise typesetting control, consider using LaTeX, Typst, or professional publishing tools directly. md2pdf is about getting from Markdown to PDF quickly with good defaults.
 
 ## ✨ Features
 
@@ -106,12 +127,16 @@ Then use with: `PDF_BACKEND=tex bash md2pdf your-file.md`
 
 ### Installation
 
-#### Method 1: Download Pre-built Workflow (Easiest)
+#### Method 1: Download Pre-built Workflow (Easiest) ⭐
 
-1. Download the latest release from [Releases](https://github.com/manwithacat/md2pdf/releases)
-2. Extract the archive
-3. Double-click `QuickAction/Convert Markdown to PDF.workflow` to install
+**📥 [Download Latest Release →](https://github.com/manwithacat/md2pdf/releases/latest)**
+
+1. Extract the downloaded `.zip` file
+2. Double-click `Convert Markdown to PDF.workflow` to install
+3. Click **Install** when prompted
 4. Right-click any `.md` file → **Quick Actions** → **Convert Markdown to PDF**
+
+That's it! 🎉
 
 #### Method 2: Build from Source
 

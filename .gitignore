@@ -1,0 +1,89 @@
+# Generated PDFs (except examples)
+*.pdf
+!examples/output/*.pdf
+
+# Generated workflow bundle during development
+# (pre-built version should be committed for releases)
+Convert*.workflow/
+!Convert Markdown to PDF.workflow/
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# LaTeX intermediate files
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.xdv
+
+# Pandoc temporary files
+*.tmp
+
+# Editor backups
+*~
+*.swp
+*.swo
+*.bak
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Test output
+test-output/
+tmp/
+
+# Personal notes
+NOTES.md
+TODO.md
+scratch/
+
+# Environment files
+.env
+.env.local
+
+# Logs
+logs/
+*.log
+
+# OS-specific
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Claude Code specific (keep .claude directory but ignore session files)
+.claude/
+dev_docs/
+# Release artifacts
+*.workflow.zip
+*.workflow.zip.sha256

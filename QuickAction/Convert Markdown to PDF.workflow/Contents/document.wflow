@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>AMApplicationBuild</key>
+	<string>533</string>
+	<key>AMApplicationVersion</key>
+	<string>2.10</string>
+	<key>AMDocumentVersion</key>
+	<string>2</string>
+	<key>actions</key>
+	<array>
+		<dict>
+			<key>action</key>
+			<dict>
+				<key>AMAccepts</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Optional</key>
+					<true/>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>AMActionVersion</key>
+				<string>2.0.3</string>
+				<key>AMApplication</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>AMParameterProperties</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<dict/>
+					<key>CheckedForUserDefaultShell</key>
+					<dict/>
+					<key>inputMethod</key>
+					<dict/>
+					<key>shell</key>
+					<dict/>
+					<key>source</key>
+					<dict/>
+				</dict>
+				<key>AMProvides</key>
+				<dict>
+					<key>Container</key>
+					<string>List</string>
+					<key>Types</key>
+					<array>
+						<string>com.apple.cocoa.string</string>
+					</array>
+				</dict>
+				<key>ActionBundlePath</key>
+				<string>/System/Library/Automator/Run Shell Script.action</string>
+				<key>ActionName</key>
+				<string>Run Shell Script</string>
+				<key>ActionParameters</key>
+				<dict>
+					<key>COMMAND_STRING</key>
+					<string>#!/bin/bash
+# md2pdf - Convert Markdown to PDF using Chrome, Typst, or LaTeX
+# https://github.com/yourusername/md2pdf
+export PATH=&quot;/opt/homebrew/bin:/usr/local/bin:/Library/TeX/texbin:/usr/bin:/bin:/usr/sbin:/sbin&quot;
+
+# Configuration - can be overridden by environment variables
+SHOW_DIALOG=&quot;${PDF_SHOW_DIALOG:-false}&quot;        # Show 3-button dialog (default: false)
+AUTO_OPEN=&quot;${PDF_AUTO_OPEN:-true}&quot;              # Auto-open PDF in Preview (default: true)
+BACKEND=&quot;${PDF_BACKEND:-auto}&quot;                  # Backend: auto, chrome, typst, tex (default: auto)
+
+# Arrays to track conversions
+converted_files=()
+failed_files=()
+
+# Detect available backends
+detect_chrome() {
+  if [ -x &quot;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&quot; ]; then
+    echo &quot;/Applications/Google Chrome.app/Contents/MacOS/Google Chrome&quot;
+    return 0
+  elif [ -x &quot;/Applications/Chromium.app/Contents/MacOS/Chromium&quot; ]; then
+    echo &quot;/Applications/Chromium.app/Contents/MacOS/Chromium&quot;
+    return 0
+  fi
+  return 1
+}
+
+detect_typst() {
+  command -v typst &gt;/dev/null 2&gt;&amp;1
+}
+
+detect_tex() {
+  [ -x &quot;/Library/TeX/texbin/xelatex&quot; ] || [ -x &quot;/Library/TeX/texbin/lualatex&quot; ]
+}
+
+# Select backend based on availability and preference
+select_backend() {
+  if [ &quot;$BACKEND&quot; = &quot;chrome&quot; ]; then
+    detect_chrome &amp;&amp; echo &quot;chrome&quot; &amp;&amp; return 0
+    return 1
+  elif [ &quot;$BACKEND&quot; = &quot;typst&quot; ]; then
+    detect_typst &amp;&amp; echo &quot;typst&quot; &amp;&amp; return 0
+    return 1
+  elif [ &quot;$BACKEND&quot; = &quot;tex&quot; ]; then
+    detect_tex &amp;&amp; echo &quot;tex&quot; &amp;&amp; return 0
+    return 1
+  else
+    # Auto-detect: Chrome &gt; Typst &gt; TeX
+    if detect_chrome &gt;/dev/null; then
+      echo &quot;chrome&quot;
+    elif detect_typst; then
+      echo &quot;typst&quot;
+    elif detect_tex; then
+      echo &quot;tex&quot;
+    else
+      echo &quot;none&quot;
+      return 1
+    fi
+  fi
+}
+
+# Convert using Chrome/Chromium headless
+convert_chrome() {
+  local md_file=&quot;$1&quot;
+  local pdf_file=&quot;$2&quot;
+  local chrome_path=&quot;$3&quot;
+
+  # Create temporary HTML with GitHub-style CSS
+  local html_file=$(mktemp).html
+
+  pandoc &quot;$md_file&quot; -t html -s \
+    --metadata title=&quot;$(basename &quot;$md_file&quot; .md)&quot; \
+    --css=&lt;(cat &lt;&lt;'CSS_STYLES'
+&lt;style&gt;
+body {
+  max-width: 800px;
+  margin: 2cm auto;
+  padding: 0 1cm;
+  font-family: -apple-system, BlinkMacSystemFont, &quot;Segoe UI&quot;, Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.6;
+  color: #24292e;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+
+code {
+  background-color: #f6f8fa;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  border-radius: 3px;
+  font-family: &quot;SF Mono&quot;, Monaco, Menlo, Consolas, monospace;
+}
+
+pre {
+  background-color: #f6f8fa;
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  border-radius: 3px;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+blockquote {
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+  margin: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+table th, table td {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+table th {
+  font-weight: 600;
+  background-color: #f6f8fa;
+}
+
+table tr {
+  background-color: #fff;
+  border-top: 1px solid #c6cbd1;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul, ol {
+  padding-left: 2em;
+}
+
+li + li {
+  margin-top: 0.25em;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 1cm;
+    max-width: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  table, pre, blockquote {
+    page-break-inside: avoid;
+  }
+}
+&lt;/style&gt;
+CSS_STYLES
+) -o &quot;$html_file&quot; 2&gt;/dev/null
+
+  if [ $? -eq 0 ]; then
+    # Generate PDF with Chrome headless
+    # Flags for more deterministic output (reduces timestamp variations)
+    &quot;$chrome_path&quot; --headless --disable-gpu --no-pdf-header-footer \
+      --run-all-compositor-stages-before-draw \
+      --virtual-time-budget=10000 \
+      --print-to-pdf=&quot;$pdf_file&quot; &quot;file://$html_file&quot; 2&gt;/dev/null
+    local result=$?
+    rm &quot;$html_file&quot;
+    return $result
+  else
+    rm &quot;$html_file&quot;
+    return 1
+  fi
+}
+
+# Convert using Typst
+convert_typst() {
+  local md_file=&quot;$1&quot;
+  local pdf_file=&quot;$2&quot;
+
+  # Convert markdown to Typst format
+  local typ_file=$(mktemp).typ
+
+  pandoc &quot;$md_file&quot; -t typst -s -o &quot;$typ_file&quot; 2&gt;/dev/null
+
+  if [ $? -eq 0 ]; then
+    typst compile &quot;$typ_file&quot; &quot;$pdf_file&quot; 2&gt;/dev/null
+    local result=$?
+    rm &quot;$typ_file&quot;
+    return $result
+  else
+    rm &quot;$typ_file&quot;
+    return 1
+  fi
+}
+
+# Convert using XeLaTeX (legacy fallback)
+convert_tex() {
+  local md_file=&quot;$1&quot;
+  local pdf_file=&quot;$2&quot;
+
+  # Create temporary header file for LaTeX table styling
+  local header_file=$(mktemp)
+  cat &gt; &quot;$header_file&quot; &lt;&lt; 'LATEX_HEADER'
+% Better table formatting with smart column widths
+\usepackage{booktabs}       % Professional table lines
+\usepackage{longtable}      % Multi-page tables
+\usepackage{array}          % Enhanced column formatting
+\usepackage{calc}           % Calculations for column widths
+
+% Unicode and emoji support via fontspec (XeLaTeX)
+\usepackage{fontspec}
+\setmainfont{Helvetica Neue}
+
+% Emoji support (requires: sudo tlmgr install newunicodechar)
+\IfFileExists{newunicodechar.sty}{
+  \usepackage{newunicodechar}
+  % Map emojis to Unicode symbols that work with Helvetica Neue
+  \newunicodechar{✅}{✓}
+  \newunicodechar{💰}{[\$]}
+  \newunicodechar{📊}{[≡]}
+  \newunicodechar{📄}{[⎘]}
+  \newunicodechar{📝}{[✎]}
+  \newunicodechar{✨}{[*]}
+  \newunicodechar{💻}{[≡]}
+  \newunicodechar{🧹}{[∼]}
+  \newunicodechar{📑}{[⎘]}
+  \newunicodechar{🔄}{[↻]}
+  \newunicodechar{⏳}{[⧗]}
+  \newunicodechar{❌}{[✗]}
+}{
+  % Fallback: emojis will show as empty boxes if newunicodechar not installed
+}
+
+% Make tables use smaller font (8pt instead of 10pt body text)
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\small\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}}
+\AtBeginEnvironment{tabular}{\small}
+
+% Improve table spacing - reduced column padding for more space
+\setlength{\tabcolsep}{4pt}        % Balanced padding (was 6pt default)
+\renewcommand{\arraystretch}{1.3}  % Better row height
+
+% Enable better line breaking in table cells with proper wrapping
+\usepackage{ragged2e}
+\newcolumntype{L}[1]{&gt;{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{&gt;{\Centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{&gt;{\RaggedLeft\arraybackslash}p{#1}}
+
+% Prevent tables from overflowing page width
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+
+% Auto-adjust table width to text width
+\setlength\LTleft{0pt minus 1fill}
+\setlength\LTright{0pt minus 1fill}
+LATEX_HEADER
+
+  pandoc -s &quot;$md_file&quot; \
+    --pdf-engine=&quot;/Library/TeX/texbin/xelatex&quot; \
+    -H &quot;$header_file&quot; \
+    -V geometry:&quot;top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm&quot; \
+    -V papersize:a4 \
+    -V fontsize:10pt \
+    -V monofont:&quot;Menlo&quot; \
+    -V colorlinks:true \
+    -V linkcolor:blue \
+    -V urlcolor:blue \
+    -V linestretch:1.2 \
+    --variable tables=true \
+    --variable longtable=true \
+    -o &quot;$pdf_file&quot; 2&gt;/dev/null
+
+  local result=$?
+  rm &quot;$header_file&quot;
+  return $result
+}
+
+# Main conversion logic
+selected_backend=$(select_backend)
+
+if [ &quot;$selected_backend&quot; = &quot;none&quot; ]; then
+  /usr/bin/osascript -e &quot;display notification \&quot;No PDF backend available. Install Chrome, Typst, or TeX.\&quot; with title \&quot;❌ PDF Error\&quot; sound name \&quot;Basso\&quot;&quot;
+  exit 1
+fi
+
+# Get Chrome path if using Chrome backend
+if [ &quot;$selected_backend&quot; = &quot;chrome&quot; ]; then
+  chrome_path=$(detect_chrome)
+fi
+
+for f in &quot;$@&quot;; do
+  if [ -f &quot;$f&quot; ] &amp;&amp; [[ &quot;$f&quot; =~ \.md$ ]]; then
+    base=&quot;${f%.*}&quot;
+    pdf_file=&quot;${base}.pdf&quot;
+    filename=$(basename &quot;$f&quot;)
+
+    # Convert based on selected backend
+    case &quot;$selected_backend&quot; in
+      chrome)
+        if convert_chrome &quot;$f&quot; &quot;$pdf_file&quot; &quot;$chrome_path&quot;; then
+          converted_files+=(&quot;$pdf_file&quot;)
+        else
+          failed_files+=(&quot;$filename&quot;)
+        fi
+        ;;
+      typst)
+        if convert_typst &quot;$f&quot; &quot;$pdf_file&quot;; then
+          converted_files+=(&quot;$pdf_file&quot;)
+        else
+          failed_files+=(&quot;$filename&quot;)
+        fi
+        ;;
+      tex)
+        if convert_tex &quot;$f&quot; &quot;$pdf_file&quot;; then
+          converted_files+=(&quot;$pdf_file&quot;)
+        else
+          failed_files+=(&quot;$filename&quot;)
+        fi
+        ;;
+    esac
+  fi
+done
+
+# Show notification with results
+if [ ${#converted_files[@]} -gt 0 ]; then
+  if [ ${#converted_files[@]} -eq 1 ]; then
+    pdf_path=&quot;${converted_files[0]}&quot;
+    pdf_name=$(basename &quot;$pdf_path&quot;)
+    pdf_dir=$(dirname &quot;$pdf_path&quot;)
+
+    if [ &quot;$SHOW_DIALOG&quot; = &quot;true&quot; ]; then
+      # Interactive notification with buttons (old behavior)
+      /usr/bin/osascript &lt;&lt;EOF
+set pdfPath to &quot;$pdf_path&quot;
+set pdfName to &quot;$pdf_name&quot;
+
+display notification &quot;✓ &quot; &amp; pdfName with title &quot;PDF Generated&quot; subtitle &quot;Ready to open&quot; sound name &quot;Glass&quot;
+
+set userChoice to button returned of (display dialog &quot;PDF created successfully:&quot; &amp; return &amp; return &amp; pdfName buttons {&quot;Show in Finder&quot;, &quot;Open PDF&quot;, &quot;Done&quot;} default button &quot;Open PDF&quot; with icon note giving up after 10)
+
+if userChoice is &quot;Open PDF&quot; then
+    do shell script &quot;open &quot; &amp; quoted form of pdfPath
+else if userChoice is &quot;Show in Finder&quot; then
+    tell application &quot;Finder&quot;
+        activate
+        reveal POSIX file pdfPath
+    end tell
+end if
+EOF
+
+    elif [ &quot;$AUTO_OPEN&quot; = &quot;true&quot; ]; then
+      # Simple notification + auto-open (new default behavior)
+      /usr/bin/osascript &lt;&lt;EOF
+set pdfPath to &quot;$pdf_path&quot;
+set pdfName to &quot;$pdf_name&quot;
+
+display notification &quot;✓ &quot; &amp; pdfName with title &quot;PDF Generated&quot; subtitle &quot;Opening in Preview...&quot; sound name &quot;Glass&quot;
+delay 0.3
+do shell script &quot;open &quot; &amp; quoted form of pdfPath
+EOF
+
+    else
+      # Just show notification, no action (quiet mode)
+      /usr/bin/osascript -e &quot;display notification \&quot;✓ $pdf_name\&quot; with title \&quot;PDF Generated\&quot; sound name \&quot;Glass\&quot;&quot;
+    fi
+
+  else
+    # Multiple files converted
+    first_pdf=&quot;${converted_files[0]}&quot;
+    pdf_dir=$(dirname &quot;$first_pdf&quot;)
+    count=${#converted_files[@]}
+
+    if [ &quot;$SHOW_DIALOG&quot; = &quot;true&quot; ]; then
+      /usr/bin/osascript &lt;&lt;EOF
+set pdfDir to &quot;$pdf_dir&quot;
+set fileCount to $count
+
+display notification fileCount &amp; &quot; PDFs created&quot; with title &quot;✅ Batch Complete&quot; sound name &quot;Glass&quot;
+
+set userChoice to button returned of (display dialog fileCount &amp; &quot; PDF files created successfully!&quot; buttons {&quot;Show in Finder&quot;, &quot;Done&quot;} default button &quot;Show in Finder&quot; with icon note giving up after 10)
+
+if userChoice is &quot;Show in Finder&quot; then
+    tell application &quot;Finder&quot;
+        activate
+        open POSIX file pdfDir
+    end tell
+end if
+EOF
+
+    elif [ &quot;$AUTO_OPEN&quot; = &quot;true&quot; ]; then
+      # Auto-open Finder to show all PDFs
+      /usr/bin/osascript &lt;&lt;EOF
+set pdfDir to &quot;$pdf_dir&quot;
+display notification &quot;$count PDFs created&quot; with title &quot;✅ Batch Complete&quot; subtitle &quot;Opening Finder...&quot; sound name &quot;Glass&quot;
+delay 0.3
+tell application &quot;Finder&quot;
+    activate
+    open POSIX file pdfDir
+end tell
+EOF
+
+    else
+      # Just notify
+      /usr/bin/osascript -e &quot;display notification \&quot;$count PDFs created\&quot; with title \&quot;✅ Batch Complete\&quot; sound name \&quot;Glass\&quot;&quot;
+    fi
+  fi
+
+elif [ ${#failed_files[@]} -gt 0 ]; then
+  # Conversion failed
+  /usr/bin/osascript -e &quot;display notification \&quot;Conversion failed. Check file format.\&quot; with title \&quot;❌ PDF Error\&quot; sound name \&quot;Basso\&quot;&quot;
+fi</string>
+					<key>CheckedForUserDefaultShell</key>
+					<true/>
+					<key>inputMethod</key>
+					<integer>1</integer>
+					<key>shell</key>
+					<string>/bin/bash</string>
+					<key>source</key>
+					<string></string>
+				</dict>
+				<key>BundleIdentifier</key>
+				<string>com.apple.RunShellScript</string>
+				<key>CFBundleVersion</key>
+				<string>2.0.3</string>
+				<key>CanShowSelectedItemsWhenRun</key>
+				<false/>
+				<key>CanShowWhenRun</key>
+				<true/>
+				<key>Category</key>
+				<array>
+					<string>AMCategoryUtilities</string>
+				</array>
+				<key>Class Name</key>
+				<string>RunShellScriptAction</string>
+				<key>InputUUID</key>
+				<string>D17CF653-1A0D-4939-97C6-A39C834C5614</string>
+				<key>Keywords</key>
+				<array>
+					<string>Shell</string>
+					<string>Script</string>
+					<string>Command</string>
+					<string>Run</string>
+					<string>Unix</string>
+				</array>
+				<key>OutputUUID</key>
+				<string>19AB7692-7281-4745-9FC8-602FBD758869</string>
+				<key>UUID</key>
+				<string>AFB905D0-4FB8-4394-90BF-390197196888</string>
+				<key>UnlocalizedApplications</key>
+				<array>
+					<string>Automator</string>
+				</array>
+				<key>arguments</key>
+				<dict>
+					<key>0</key>
+					<dict>
+						<key>default value</key>
+						<integer>0</integer>
+						<key>name</key>
+						<string>inputMethod</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>0</string>
+					</dict>
+					<key>1</key>
+					<dict>
+						<key>default value</key>
+						<false/>
+						<key>name</key>
+						<string>CheckedForUserDefaultShell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>1</string>
+					</dict>
+					<key>2</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>source</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>2</string>
+					</dict>
+					<key>3</key>
+					<dict>
+						<key>default value</key>
+						<string></string>
+						<key>name</key>
+						<string>COMMAND_STRING</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>3</string>
+					</dict>
+					<key>4</key>
+					<dict>
+						<key>default value</key>
+						<string>/bin/sh</string>
+						<key>name</key>
+						<string>shell</string>
+						<key>required</key>
+						<string>0</string>
+						<key>type</key>
+						<string>0</string>
+						<key>uuid</key>
+						<string>4</string>
+					</dict>
+				</dict>
+				<key>isViewVisible</key>
+				<integer>1</integer>
+				<key>location</key>
+				<string>487.500000:673.000000</string>
+				<key>nibPath</key>
+				<string>/System/Library/Automator/Run Shell Script.action/Contents/Resources/Base.lproj/main.nib</string>
+			</dict>
+			<key>isViewVisible</key>
+			<integer>1</integer>
+		</dict>
+	</array>
+	<key>connectors</key>
+	<dict/>
+	<key>workflowMetaData</key>
+	<dict>
+		<key>applicationBundleID</key>
+		<string>com.apple.finder</string>
+		<key>applicationBundleIDsByPath</key>
+		<dict>
+			<key>/System/Library/CoreServices/Finder.app</key>
+			<string>com.apple.finder</string>
+		</dict>
+		<key>applicationPath</key>
+		<string>/System/Library/CoreServices/Finder.app</string>
+		<key>applicationPaths</key>
+		<array>
+			<string>/System/Library/CoreServices/Finder.app</string>
+		</array>
+		<key>inputTypeIdentifier</key>
+		<string>com.apple.Automator.fileSystemObject</string>
+		<key>outputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>presentationMode</key>
+		<integer>15</integer>
+		<key>processesInput</key>
+		<false/>
+		<key>serviceApplicationBundleID</key>
+		<string>com.apple.finder</string>
+		<key>serviceApplicationPath</key>
+		<string>/System/Library/CoreServices/Finder.app</string>
+		<key>serviceInputTypeIdentifier</key>
+		<string>com.apple.Automator.fileSystemObject</string>
+		<key>serviceOutputTypeIdentifier</key>
+		<string>com.apple.Automator.nothing</string>
+		<key>serviceProcessesInput</key>
+		<false/>
+		<key>systemImageName</key>
+		<string>NSActionTemplate</string>
+		<key>useAutomaticInputType</key>
+		<false/>
+		<key>workflowTypeIdentifier</key>
+		<string>com.apple.Automator.servicesMenu</string>
+	</dict>
+</dict>
+</plist>

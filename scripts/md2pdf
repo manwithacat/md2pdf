@@ -1,0 +1,438 @@
+#!/bin/bash
+# md2pdf - Convert Markdown to PDF using Chrome, Typst, or LaTeX
+# https://github.com/yourusername/md2pdf
+export PATH="/opt/homebrew/bin:/usr/local/bin:/Library/TeX/texbin:/usr/bin:/bin:/usr/sbin:/sbin"
+
+# Configuration - can be overridden by environment variables
+SHOW_DIALOG="${PDF_SHOW_DIALOG:-false}"        # Show 3-button dialog (default: false)
+AUTO_OPEN="${PDF_AUTO_OPEN:-true}"              # Auto-open PDF in Preview (default: true)
+BACKEND="${PDF_BACKEND:-auto}"                  # Backend: auto, chrome, typst, tex (default: auto)
+
+# Arrays to track conversions
+converted_files=()
+failed_files=()
+
+# Detect available backends
+detect_chrome() {
+  if [ -x "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" ]; then
+    echo "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    return 0
+  elif [ -x "/Applications/Chromium.app/Contents/MacOS/Chromium" ]; then
+    echo "/Applications/Chromium.app/Contents/MacOS/Chromium"
+    return 0
+  fi
+  return 1
+}
+
+detect_typst() {
+  command -v typst >/dev/null 2>&1
+}
+
+detect_tex() {
+  [ -x "/Library/TeX/texbin/xelatex" ] || [ -x "/Library/TeX/texbin/lualatex" ]
+}
+
+# Select backend based on availability and preference
+select_backend() {
+  if [ "$BACKEND" = "chrome" ]; then
+    detect_chrome && echo "chrome" && return 0
+    return 1
+  elif [ "$BACKEND" = "typst" ]; then
+    detect_typst && echo "typst" && return 0
+    return 1
+  elif [ "$BACKEND" = "tex" ]; then
+    detect_tex && echo "tex" && return 0
+    return 1
+  else
+    # Auto-detect: Chrome > Typst > TeX
+    if detect_chrome >/dev/null; then
+      echo "chrome"
+    elif detect_typst; then
+      echo "typst"
+    elif detect_tex; then
+      echo "tex"
+    else
+      echo "none"
+      return 1
+    fi
+  fi
+}
+
+# Convert using Chrome/Chromium headless
+convert_chrome() {
+  local md_file="$1"
+  local pdf_file="$2"
+  local chrome_path="$3"
+
+  # Create temporary HTML with GitHub-style CSS
+  local html_file=$(mktemp).html
+
+  pandoc "$md_file" -t html -s \
+    --metadata title="$(basename "$md_file" .md)" \
+    --css=<(cat <<'CSS_STYLES'
+<style>
+body {
+  max-width: 800px;
+  margin: 2cm auto;
+  padding: 0 1cm;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font-size: 11pt;
+  line-height: 1.6;
+  color: #24292e;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+h1 { font-size: 2em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+h2 { font-size: 1.5em; border-bottom: 1px solid #eaecef; padding-bottom: 0.3em; }
+h3 { font-size: 1.25em; }
+
+code {
+  background-color: #f6f8fa;
+  padding: 0.2em 0.4em;
+  margin: 0;
+  font-size: 85%;
+  border-radius: 3px;
+  font-family: "SF Mono", Monaco, Menlo, Consolas, monospace;
+}
+
+pre {
+  background-color: #f6f8fa;
+  padding: 16px;
+  overflow: auto;
+  font-size: 85%;
+  line-height: 1.45;
+  border-radius: 3px;
+}
+
+pre code {
+  background-color: transparent;
+  padding: 0;
+}
+
+blockquote {
+  padding: 0 1em;
+  color: #6a737d;
+  border-left: 0.25em solid #dfe2e5;
+  margin: 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 16px 0;
+}
+
+table th, table td {
+  padding: 6px 13px;
+  border: 1px solid #dfe2e5;
+}
+
+table th {
+  font-weight: 600;
+  background-color: #f6f8fa;
+}
+
+table tr {
+  background-color: #fff;
+  border-top: 1px solid #c6cbd1;
+}
+
+table tr:nth-child(2n) {
+  background-color: #f6f8fa;
+}
+
+a {
+  color: #0366d6;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+ul, ol {
+  padding-left: 2em;
+}
+
+li + li {
+  margin-top: 0.25em;
+}
+
+@media print {
+  body {
+    margin: 0;
+    padding: 1cm;
+    max-width: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    page-break-after: avoid;
+  }
+
+  table, pre, blockquote {
+    page-break-inside: avoid;
+  }
+}
+</style>
+CSS_STYLES
+) -o "$html_file" 2>/dev/null
+
+  if [ $? -eq 0 ]; then
+    # Generate PDF with Chrome headless
+    # Flags for more deterministic output (reduces timestamp variations)
+    "$chrome_path" --headless --disable-gpu --no-pdf-header-footer \
+      --run-all-compositor-stages-before-draw \
+      --virtual-time-budget=10000 \
+      --print-to-pdf="$pdf_file" "file://$html_file" 2>/dev/null
+    local result=$?
+    rm "$html_file"
+    return $result
+  else
+    rm "$html_file"
+    return 1
+  fi
+}
+
+# Convert using Typst
+convert_typst() {
+  local md_file="$1"
+  local pdf_file="$2"
+
+  # Convert markdown to Typst format
+  local typ_file=$(mktemp).typ
+
+  pandoc "$md_file" -t typst -s -o "$typ_file" 2>/dev/null
+
+  if [ $? -eq 0 ]; then
+    typst compile "$typ_file" "$pdf_file" 2>/dev/null
+    local result=$?
+    rm "$typ_file"
+    return $result
+  else
+    rm "$typ_file"
+    return 1
+  fi
+}
+
+# Convert using XeLaTeX (legacy fallback)
+convert_tex() {
+  local md_file="$1"
+  local pdf_file="$2"
+
+  # Create temporary header file for LaTeX table styling
+  local header_file=$(mktemp)
+  cat > "$header_file" << 'LATEX_HEADER'
+% Better table formatting with smart column widths
+\usepackage{booktabs}       % Professional table lines
+\usepackage{longtable}      % Multi-page tables
+\usepackage{array}          % Enhanced column formatting
+\usepackage{calc}           % Calculations for column widths
+
+% Unicode and emoji support via fontspec (XeLaTeX)
+\usepackage{fontspec}
+\setmainfont{Helvetica Neue}
+
+% Emoji support (requires: sudo tlmgr install newunicodechar)
+\IfFileExists{newunicodechar.sty}{
+  \usepackage{newunicodechar}
+  % Map emojis to Unicode symbols that work with Helvetica Neue
+  \newunicodechar{✅}{✓}
+  \newunicodechar{💰}{[\$]}
+  \newunicodechar{📊}{[≡]}
+  \newunicodechar{📄}{[⎘]}
+  \newunicodechar{📝}{[✎]}
+  \newunicodechar{✨}{[*]}
+  \newunicodechar{💻}{[≡]}
+  \newunicodechar{🧹}{[∼]}
+  \newunicodechar{📑}{[⎘]}
+  \newunicodechar{🔄}{[↻]}
+  \newunicodechar{⏳}{[⧗]}
+  \newunicodechar{❌}{[✗]}
+}{
+  % Fallback: emojis will show as empty boxes if newunicodechar not installed
+}
+
+% Make tables use smaller font (8pt instead of 10pt body text)
+\usepackage{etoolbox}
+\AtBeginEnvironment{longtable}{\small\setlength{\LTleft}{0pt}\setlength{\LTright}{0pt}}
+\AtBeginEnvironment{tabular}{\small}
+
+% Improve table spacing - reduced column padding for more space
+\setlength{\tabcolsep}{4pt}        % Balanced padding (was 6pt default)
+\renewcommand{\arraystretch}{1.3}  % Better row height
+
+% Enable better line breaking in table cells with proper wrapping
+\usepackage{ragged2e}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{C}[1]{>{\Centering\arraybackslash}p{#1}}
+\newcolumntype{R}[1]{>{\RaggedLeft\arraybackslash}p{#1}}
+
+% Prevent tables from overflowing page width
+\setlength\LTleft{0pt}
+\setlength\LTright{0pt}
+
+% Auto-adjust table width to text width
+\setlength\LTleft{0pt minus 1fill}
+\setlength\LTright{0pt minus 1fill}
+LATEX_HEADER
+
+  pandoc -s "$md_file" \
+    --pdf-engine="/Library/TeX/texbin/xelatex" \
+    -H "$header_file" \
+    -V geometry:"top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm" \
+    -V papersize:a4 \
+    -V fontsize:10pt \
+    -V monofont:"Menlo" \
+    -V colorlinks:true \
+    -V linkcolor:blue \
+    -V urlcolor:blue \
+    -V linestretch:1.2 \
+    --variable tables=true \
+    --variable longtable=true \
+    -o "$pdf_file" 2>/dev/null
+
+  local result=$?
+  rm "$header_file"
+  return $result
+}
+
+# Main conversion logic
+selected_backend=$(select_backend)
+
+if [ "$selected_backend" = "none" ]; then
+  /usr/bin/osascript -e "display notification \"No PDF backend available. Install Chrome, Typst, or TeX.\" with title \"❌ PDF Error\" sound name \"Basso\""
+  exit 1
+fi
+
+# Get Chrome path if using Chrome backend
+if [ "$selected_backend" = "chrome" ]; then
+  chrome_path=$(detect_chrome)
+fi
+
+for f in "$@"; do
+  if [ -f "$f" ] && [[ "$f" =~ \.md$ ]]; then
+    base="${f%.*}"
+    pdf_file="${base}.pdf"
+    filename=$(basename "$f")
+
+    # Convert based on selected backend
+    case "$selected_backend" in
+      chrome)
+        if convert_chrome "$f" "$pdf_file" "$chrome_path"; then
+          converted_files+=("$pdf_file")
+        else
+          failed_files+=("$filename")
+        fi
+        ;;
+      typst)
+        if convert_typst "$f" "$pdf_file"; then
+          converted_files+=("$pdf_file")
+        else
+          failed_files+=("$filename")
+        fi
+        ;;
+      tex)
+        if convert_tex "$f" "$pdf_file"; then
+          converted_files+=("$pdf_file")
+        else
+          failed_files+=("$filename")
+        fi
+        ;;
+    esac
+  fi
+done
+
+# Show notification with results
+if [ ${#converted_files[@]} -gt 0 ]; then
+  if [ ${#converted_files[@]} -eq 1 ]; then
+    pdf_path="${converted_files[0]}"
+    pdf_name=$(basename "$pdf_path")
+    pdf_dir=$(dirname "$pdf_path")
+
+    if [ "$SHOW_DIALOG" = "true" ]; then
+      # Interactive notification with buttons (old behavior)
+      /usr/bin/osascript <<EOF
+set pdfPath to "$pdf_path"
+set pdfName to "$pdf_name"
+
+display notification "✓ " & pdfName with title "PDF Generated" subtitle "Ready to open" sound name "Glass"
+
+set userChoice to button returned of (display dialog "PDF created successfully:" & return & return & pdfName buttons {"Show in Finder", "Open PDF", "Done"} default button "Open PDF" with icon note giving up after 10)
+
+if userChoice is "Open PDF" then
+    do shell script "open " & quoted form of pdfPath
+else if userChoice is "Show in Finder" then
+    tell application "Finder"
+        activate
+        reveal POSIX file pdfPath
+    end tell
+end if
+EOF
+
+    elif [ "$AUTO_OPEN" = "true" ]; then
+      # Simple notification + auto-open (new default behavior)
+      /usr/bin/osascript <<EOF
+set pdfPath to "$pdf_path"
+set pdfName to "$pdf_name"
+
+display notification "✓ " & pdfName with title "PDF Generated" subtitle "Opening in Preview..." sound name "Glass"
+delay 0.3
+do shell script "open " & quoted form of pdfPath
+EOF
+
+    else
+      # Just show notification, no action (quiet mode)
+      /usr/bin/osascript -e "display notification \"✓ $pdf_name\" with title \"PDF Generated\" sound name \"Glass\""
+    fi
+
+  else
+    # Multiple files converted
+    first_pdf="${converted_files[0]}"
+    pdf_dir=$(dirname "$first_pdf")
+    count=${#converted_files[@]}
+
+    if [ "$SHOW_DIALOG" = "true" ]; then
+      /usr/bin/osascript <<EOF
+set pdfDir to "$pdf_dir"
+set fileCount to $count
+
+display notification fileCount & " PDFs created" with title "✅ Batch Complete" sound name "Glass"
+
+set userChoice to button returned of (display dialog fileCount & " PDF files created successfully!" buttons {"Show in Finder", "Done"} default button "Show in Finder" with icon note giving up after 10)
+
+if userChoice is "Show in Finder" then
+    tell application "Finder"
+        activate
+        open POSIX file pdfDir
+    end tell
+end if
+EOF
+
+    elif [ "$AUTO_OPEN" = "true" ]; then
+      # Auto-open Finder to show all PDFs
+      /usr/bin/osascript <<EOF
+set pdfDir to "$pdf_dir"
+display notification "$count PDFs created" with title "✅ Batch Complete" subtitle "Opening Finder..." sound name "Glass"
+delay 0.3
+tell application "Finder"
+    activate
+    open POSIX file pdfDir
+end tell
+EOF
+
+    else
+      # Just notify
+      /usr/bin/osascript -e "display notification \"$count PDFs created\" with title \"✅ Batch Complete\" sound name \"Glass\""
+    fi
+  fi
+
+elif [ ${#failed_files[@]} -gt 0 ]; then
+  # Conversion failed
+  /usr/bin/osascript -e "display notification \"Conversion failed. Check file format.\" with title \"❌ PDF Error\" sound name \"Basso\""
+fi

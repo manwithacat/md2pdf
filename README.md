@@ -108,7 +108,7 @@ Then use with: `PDF_BACKEND=tex bash md2pdf your-file.md`
 
 #### Method 1: Download Pre-built Workflow (Easiest)
 
-1. Download the latest release from [Releases](https://github.com/yourusername/md2pdf/releases)
+1. Download the latest release from [Releases](https://github.com/manwithacat/md2pdf/releases)
 2. Extract the archive
 3. Double-click `QuickAction/Convert Markdown to PDF.workflow` to install
 4. Right-click any `.md` file → **Quick Actions** → **Convert Markdown to PDF**
@@ -117,7 +117,7 @@ Then use with: `PDF_BACKEND=tex bash md2pdf your-file.md`
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/md2pdf.git
+git clone https://github.com/manwithacat/md2pdf.git
 cd md2pdf
 
 # Install dependencies
@@ -569,8 +569,8 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## 📮 Support
 
-- **Issues**: [GitHub Issues](https://github.com/yourusername/md2pdfscript/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/yourusername/md2pdfscript/discussions)
+- **Issues**: [GitHub Issues](https://github.com/manwithacat/md2pdf/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/manwithacat/md2pdf/discussions)
 
 ## 🗺️ Roadmap
 

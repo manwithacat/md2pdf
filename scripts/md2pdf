@@ -1,6 +1,6 @@
 #!/bin/bash
 # md2pdf - Convert Markdown to PDF using Chrome, Typst, or LaTeX
-# https://github.com/yourusername/md2pdf
+# https://github.com/manwithacat/md2pdf
 export PATH="/opt/homebrew/bin:/usr/local/bin:/Library/TeX/texbin:/usr/bin:/bin:/usr/sbin:/sbin"
 
 # Configuration - can be overridden by environment variables

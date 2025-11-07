@@ -54,7 +54,6 @@ For precise typesetting control, consider using LaTeX, Typst, or professional pu
 - 🔨 **Build System**: Comprehensive Makefile with 15+ targets
 - 🧪 **Test Suite**: 16 automated tests (8 basic, 8 advanced)
 - 📦 **Pre-built Bundle**: Ready-to-install Quick Action workflow
-- 📝 **Extensive Documentation**: 11 markdown documentation files
 
 ## 📸 Screenshots
 
@@ -72,7 +71,7 @@ For precise typesetting control, consider using LaTeX, Typst, or professional pu
 - Multi-page tables break cleanly with repeated headers
 - Professional booktabs styling
 
-*[Add screenshots folder with examples]*
+*[TODO: Add screenshots folder with examples]*
 
 ## 🚀 Quick Start
 

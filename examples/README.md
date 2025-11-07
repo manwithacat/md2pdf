@@ -12,6 +12,22 @@ examples/
 
 ## Example Files
 
+### `markdown-test-comprehensive.md` ⭐
+**Standard Markdown test file** exercising all common Markdown features:
+- All 6 header levels (H1-H6) with alternative syntax
+- Emphasis (bold, italic, strikethrough)
+- Lists (ordered, unordered, nested, task lists)
+- Links (inline, reference, automatic)
+- Code (inline, fenced blocks with syntax highlighting)
+- Tables (simple, aligned, with Unicode)
+- Blockquotes (simple, nested, with elements)
+- Special characters and emoji
+- International character sets (Latin, Greek, Cyrillic, CJK, Arabic, Hebrew)
+
+This is the **recommended test file** for validating Markdown parsers and PDF rendering engines.
+
+**Note:** Chrome version only - LaTeX backend does not support complex Unicode (CJK, Arabic, Hebrew) without additional font configuration.
+
 ### `simple-example.md`
 Basic Markdown conversion example with headers, paragraphs, lists, and links.
 

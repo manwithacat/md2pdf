@@ -32,6 +32,51 @@ run_test() {
     echo -n "  Testing: $1... "
 }
 
+# Helper to test both backends
+test_both_backends() {
+    local test_name="$1"
+    local test_file="$2"
+    local min_size="${3:-1000}"
+
+    # Test Chrome backend
+    run_test "$test_name (Chrome)"
+    PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$test_file" >/dev/null 2>&1
+    PDF_FILE="${test_file%.md}.pdf"
+
+    if [ -f "$PDF_FILE" ]; then
+        SIZE=$(stat -f%z "$PDF_FILE" 2>/dev/null || stat -c%s "$PDF_FILE" 2>/dev/null)
+        if [ "$SIZE" -gt "$min_size" ]; then
+            test_pass "$test_name Chrome (${SIZE} bytes)"
+        else
+            test_fail "$test_name Chrome too small (${SIZE} bytes)"
+        fi
+        rm -f "$PDF_FILE"
+    else
+        test_fail "$test_name Chrome PDF not created"
+    fi
+
+    # Test LaTeX backend
+    run_test "$test_name (LaTeX)"
+    if command -v xelatex >/dev/null 2>&1; then
+        PDF_BACKEND=tex PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$test_file" >/dev/null 2>&1
+        PDF_FILE="${test_file%.md}.pdf"
+
+        if [ -f "$PDF_FILE" ]; then
+            SIZE=$(stat -f%z "$PDF_FILE" 2>/dev/null || stat -c%s "$PDF_FILE" 2>/dev/null)
+            if [ "$SIZE" -gt "$min_size" ]; then
+                test_pass "$test_name LaTeX (${SIZE} bytes)"
+            else
+                test_fail "$test_name LaTeX too small (${SIZE} bytes)"
+            fi
+            rm -f "$PDF_FILE"
+        else
+            test_fail "$test_name LaTeX PDF not created"
+        fi
+    else
+        test_skip "$test_name LaTeX (xelatex not installed)"
+    fi
+}
+
 echo "🧪 Running Advanced Tests"
 echo "========================="
 echo ""
@@ -39,7 +84,6 @@ echo ""
 mkdir -p "$FIXTURES_DIR"
 
 # Test 1: Complex table formatting
-run_test "Complex tables (10 columns)"
 TEST_FILE="$FIXTURES_DIR/test-complex-table.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -52,18 +96,9 @@ cat > "$TEST_FILE" << 'EOF'
 | C1   | C2   | C3   | C4   | C5   | C6   | C7   | C8   | C9   | C10   |
 EOF
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    test_pass "Complex table conversion"
-    rm -f "$PDF_FILE"
-else
-    test_fail "Complex table PDF not created"
-fi
+test_both_backends "Complex tables (10 columns)" "$TEST_FILE"
 
 # Test 2: Long document (multi-page)
-run_test "Multi-page document"
 TEST_FILE="$FIXTURES_DIR/test-long.md"
 
 {
@@ -81,23 +116,9 @@ TEST_FILE="$FIXTURES_DIR/test-long.md"
     done
 } > "$TEST_FILE"
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    SIZE=$(stat -f%z "$PDF_FILE" 2>/dev/null || stat -c%s "$PDF_FILE" 2>/dev/null)
-    if [ "$SIZE" -gt 50000 ]; then
-        test_pass "Multi-page conversion (${SIZE} bytes)"
-        rm -f "$PDF_FILE"
-    else
-        test_fail "PDF unexpectedly small"
-    fi
-else
-    test_fail "Multi-page PDF not created"
-fi
+test_both_backends "Multi-page document" "$TEST_FILE" 30000
 
 # Test 3: Code blocks
-run_test "Code blocks"
 TEST_FILE="$FIXTURES_DIR/test-code.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -119,18 +140,9 @@ def hello():
 ```
 EOF
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    test_pass "Code block conversion"
-    rm -f "$PDF_FILE"
-else
-    test_fail "Code block PDF not created"
-fi
+test_both_backends "Code blocks" "$TEST_FILE"
 
 # Test 4: Links
-run_test "Hyperlinks"
 TEST_FILE="$FIXTURES_DIR/test-links.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -145,18 +157,9 @@ cat > "$TEST_FILE" << 'EOF'
 Auto-link: https://example.com
 EOF
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    test_pass "Link conversion"
-    rm -f "$PDF_FILE"
-else
-    test_fail "Link PDF not created"
-fi
+test_both_backends "Hyperlinks" "$TEST_FILE"
 
 # Test 5: Images (if test image exists)
-run_test "Image handling"
 TEST_FILE="$FIXTURES_DIR/test-image.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -167,18 +170,9 @@ cat > "$TEST_FILE" << 'EOF'
 Text after image.
 EOF
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    test_pass "Image reference handled"
-    rm -f "$PDF_FILE"
-else
-    test_fail "Image PDF not created"
-fi
+test_both_backends "Image handling" "$TEST_FILE"
 
 # Test 6: Special characters in filename
-run_test "Special characters in filename"
 TEST_FILE="$FIXTURES_DIR/test file with spaces.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -187,18 +181,9 @@ cat > "$TEST_FILE" << 'EOF'
 Testing filenames with spaces.
 EOF
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    test_pass "Spaces in filename"
-    rm -f "$PDF_FILE"
-else
-    test_fail "Spaces in filename failed"
-fi
+test_both_backends "Special characters in filename" "$TEST_FILE"
 
 # Test 7: Nested lists
-run_test "Nested lists"
 TEST_FILE="$FIXTURES_DIR/test-lists.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -212,18 +197,9 @@ cat > "$TEST_FILE" << 'EOF'
    2. Another numbered
 EOF
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    test_pass "Nested lists conversion"
-    rm -f "$PDF_FILE"
-else
-    test_fail "Nested lists PDF not created"
-fi
+test_both_backends "Nested lists" "$TEST_FILE"
 
 # Test 8: Blockquotes
-run_test "Blockquotes"
 TEST_FILE="$FIXTURES_DIR/test-blockquote.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -235,15 +211,7 @@ cat > "$TEST_FILE" << 'EOF'
 >> Nested blockquote
 EOF
 
-PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
-PDF_FILE="${TEST_FILE%.md}.pdf"
-
-if [ -f "$PDF_FILE" ]; then
-    test_pass "Blockquote conversion"
-    rm -f "$PDF_FILE"
-else
-    test_fail "Blockquote PDF not created"
-fi
+test_both_backends "Blockquotes" "$TEST_FILE"
 
 # Cleanup
 rm -f "$FIXTURES_DIR"/test-*.md

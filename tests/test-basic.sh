@@ -67,7 +67,7 @@ else
 fi
 
 # Test 3: Create simple test file
-run_test "Simple conversion"
+run_test "Simple conversion (Chrome)"
 TEST_FILE="$FIXTURES_DIR/test-simple.md"
 mkdir -p "$FIXTURES_DIR"
 
@@ -96,7 +96,7 @@ PDF_FILE="${TEST_FILE%.md}.pdf"
 if [ -f "$PDF_FILE" ]; then
     SIZE=$(stat -f%z "$PDF_FILE" 2>/dev/null || stat -c%s "$PDF_FILE" 2>/dev/null)
     if [ "$SIZE" -gt 1000 ]; then
-        test_pass "Simple conversion (${SIZE} bytes)"
+        test_pass "Simple conversion Chrome (${SIZE} bytes)"
         rm -f "$PDF_FILE"
     else
         test_fail "PDF too small (${SIZE} bytes)"
@@ -105,8 +105,29 @@ else
     test_fail "PDF not created"
 fi
 
-# Test 4: Unicode characters
-run_test "Unicode support"
+# Test 3b: Simple conversion with LaTeX backend
+run_test "Simple conversion (LaTeX)"
+if command -v xelatex >/dev/null 2>&1; then
+    PDF_BACKEND=tex PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
+    PDF_FILE="${TEST_FILE%.md}.pdf"
+
+    if [ -f "$PDF_FILE" ]; then
+        SIZE=$(stat -f%z "$PDF_FILE" 2>/dev/null || stat -c%s "$PDF_FILE" 2>/dev/null)
+        if [ "$SIZE" -gt 1000 ]; then
+            test_pass "Simple conversion LaTeX (${SIZE} bytes)"
+            rm -f "$PDF_FILE"
+        else
+            test_fail "LaTeX PDF too small (${SIZE} bytes)"
+        fi
+    else
+        test_fail "LaTeX PDF not created"
+    fi
+else
+    test_skip "LaTeX backend (xelatex not installed)"
+fi
+
+# Test 4: Unicode characters (Chrome)
+run_test "Unicode support (Chrome)"
 TEST_FILE="$FIXTURES_DIR/test-unicode.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -123,10 +144,26 @@ PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2
 PDF_FILE="${TEST_FILE%.md}.pdf"
 
 if [ -f "$PDF_FILE" ]; then
-    test_pass "Unicode conversion"
+    test_pass "Unicode conversion Chrome"
     rm -f "$PDF_FILE"
 else
     test_fail "Unicode PDF not created"
+fi
+
+# Test 4b: Unicode characters (LaTeX)
+run_test "Unicode support (LaTeX)"
+if command -v xelatex >/dev/null 2>&1; then
+    PDF_BACKEND=tex PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
+    PDF_FILE="${TEST_FILE%.md}.pdf"
+
+    if [ -f "$PDF_FILE" ]; then
+        test_pass "Unicode conversion LaTeX"
+        rm -f "$PDF_FILE"
+    else
+        test_fail "LaTeX Unicode PDF not created"
+    fi
+else
+    test_skip "LaTeX backend (xelatex not installed)"
 fi
 
 # Test 5: Empty file handling
@@ -156,8 +193,8 @@ else
     test_fail "Batch conversion failed"
 fi
 
-# Test 7: Emoji support (if installed)
-run_test "Emoji support"
+# Test 7: Emoji support (Chrome)
+run_test "Emoji support (Chrome)"
 TEST_FILE="$FIXTURES_DIR/test-emoji.md"
 
 cat > "$TEST_FILE" << 'EOF'
@@ -172,15 +209,31 @@ PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2
 PDF_FILE="${TEST_FILE%.md}.pdf"
 
 if [ -f "$PDF_FILE" ]; then
-    # Check if newunicodechar is installed
-    if kpsewhich newunicodechar.sty >/dev/null 2>&1; then
-        test_pass "Emoji conversion (newunicodechar installed)"
-    else
-        test_pass "Emoji conversion (fallback mode)"
-    fi
+    test_pass "Emoji conversion Chrome (full color)"
     rm -f "$PDF_FILE"
 else
     test_fail "Emoji PDF not created"
+fi
+
+# Test 7b: Emoji support (LaTeX)
+run_test "Emoji support (LaTeX)"
+if command -v xelatex >/dev/null 2>&1; then
+    PDF_BACKEND=tex PDF_AUTO_OPEN=false bash "$PROJECT_DIR/scripts/md2pdf" "$TEST_FILE" >/dev/null 2>&1
+    PDF_FILE="${TEST_FILE%.md}.pdf"
+
+    if [ -f "$PDF_FILE" ]; then
+        # Check if newunicodechar is installed
+        if kpsewhich newunicodechar.sty >/dev/null 2>&1; then
+            test_pass "Emoji conversion LaTeX (mapped symbols)"
+        else
+            test_pass "Emoji conversion LaTeX (boxes)"
+        fi
+        rm -f "$PDF_FILE"
+    else
+        test_fail "LaTeX Emoji PDF not created"
+    fi
+else
+    test_skip "LaTeX backend (xelatex not installed)"
 fi
 
 # Test 8: Environment variables

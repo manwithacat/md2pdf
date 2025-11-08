@@ -239,7 +239,7 @@ done
 
 ### Blockquote with Other Elements
 
-> ## Header in Blockquote
+> **Header in Blockquote**
 >
 > This blockquote contains other markdown elements:
 >

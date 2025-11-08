@@ -117,11 +117,19 @@ examples: build
 		base=$$(basename "$$md" .md); \
 		echo "  Converting $$base.md..."; \
 		PDF_AUTO_OPEN=false bash $(SCRIPT) "$$md" 2>/dev/null; \
-		mv "$(EXAMPLES_DIR)/input/$$base.pdf" "$(EXAMPLES_DIR)/output/$$base-chrome.pdf" 2>/dev/null; \
-		echo "    ✓ $$base-chrome.pdf"; \
+		if [ -f "$(EXAMPLES_DIR)/input/$$base.pdf" ]; then \
+			mv "$(EXAMPLES_DIR)/input/$$base.pdf" "$(EXAMPLES_DIR)/output/$$base-chrome.pdf"; \
+			echo "    ✓ $$base-chrome.pdf"; \
+		else \
+			echo "    ✗ $$base-chrome.pdf (failed)"; \
+		fi; \
 		PDF_BACKEND=tex PDF_AUTO_OPEN=false bash $(SCRIPT) "$$md" 2>/dev/null; \
-		mv "$(EXAMPLES_DIR)/input/$$base.pdf" "$(EXAMPLES_DIR)/output/$$base-latex.pdf" 2>/dev/null; \
-		echo "    ✓ $$base-latex.pdf"; \
+		if [ -f "$(EXAMPLES_DIR)/input/$$base.pdf" ]; then \
+			mv "$(EXAMPLES_DIR)/input/$$base.pdf" "$(EXAMPLES_DIR)/output/$$base-latex.pdf"; \
+			echo "    ✓ $$base-latex.pdf"; \
+		else \
+			echo "    ⚠ $$base-latex.pdf (skipped - may need soul.sty or other packages)"; \
+		fi; \
 	done
 	@echo "✅ Example PDFs generated in $(EXAMPLES_DIR)/output/"
 	@echo "   Chrome backend: *-chrome.pdf"

@@ -436,6 +436,10 @@ convert_tex() {
   % Users can install with: sudo tlmgr install xecjk
 }
 
+% Fix for pandoc's tightlist (compact lists)
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
 % Make tables use smaller font and full width
 \usepackage{etoolbox}
 \AtBeginEnvironment{longtable}{%

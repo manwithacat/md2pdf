@@ -68,6 +68,7 @@ sudo tlmgr install polyglossia
 sudo tlmgr install bidi
 sudo tlmgr install unicode-math
 sudo tlmgr install xecjk
+sudo tlmgr install soul           # For strikethrough text support
 
 # Or install full TeX Live
 brew install --cask mactex  # ~7GB, includes everything

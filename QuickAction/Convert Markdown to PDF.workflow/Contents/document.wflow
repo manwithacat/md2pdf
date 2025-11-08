@@ -633,6 +633,43 @@ convert_tex() {
   % Fallback: emojis will show as empty boxes if newunicodechar not installed
 }
 
+% Multi-script Unicode support (requires MacTeX with appropriate packages)
+% If packages are missing, characters will render as boxes but won't break compilation
+\IfFileExists{polyglossia.sty}{
+  \usepackage{polyglossia}
+  \setmainlanguage{english}
+
+  % Define font families for different scripts
+  % These use system fonts available on macOS
+  \newfontfamily\arabicfont{Arial}[Script=Arabic]
+  \newfontfamily\hebrewfont{Arial}[Script=Hebrew]
+  \newfontfamily\greekfont{Arial}[Script=Greek]
+  \newfontfamily\cyrillicfont{Arial}[Script=Cyrillic]
+}{
+  % Fallback: polyglossia not installed
+  % Basic fontspec should handle Greek and Cyrillic in Helvetica Neue
+}
+
+% CJK (Chinese, Japanese, Korean) support
+\IfFileExists{xeCJK.sty}{
+  \usepackage{xeCJK}
+  % Use macOS system fonts for CJK
+  \setCJKmainfont{Hiragino Sans GB}[
+    BoldFont=Hiragino Sans GB W6,
+    ItalicFont=Hiragino Sans GB W3
+  ]
+  \setCJKsansfont{Hiragino Sans GB}
+  \setCJKmonofont{Hiragino Sans GB}
+}{
+  % Fallback: xeCJK not installed
+  % CJK characters will render as boxes
+  % Users can install with: sudo tlmgr install xecjk
+}
+
+% Fix for pandoc's tightlist (compact lists)
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
 % Make tables use smaller font and full width
 \usepackage{etoolbox}
 \AtBeginEnvironment{longtable}{%

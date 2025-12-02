@@ -58,11 +58,92 @@ select_backend() {
   fi
 }
 
+# Embed images as base64 data URIs in HTML file
+# This ensures images are included in the PDF when using Chrome headless
+embed_images_as_base64() {
+  local html_file="$1"
+  local base_dir="$2"
+
+  # Create a temporary file for the modified HTML
+  local temp_html=$(mktemp)
+
+  # Use Python to parse and modify the HTML (more reliable than sed for this)
+  python3 << PYTHON_SCRIPT
+import sys
+import os
+import base64
+import re
+from pathlib import Path
+
+html_file = "$html_file"
+base_dir = "$base_dir"
+
+# Read the HTML file
+with open(html_file, 'r', encoding='utf-8') as f:
+    html_content = f.read()
+
+# Function to convert image path to base64 data URI
+def img_to_base64(match):
+    src = match.group(1)
+
+    # Skip if already a data URI or external URL
+    if src.startswith('data:') or src.startswith('http://') or src.startswith('https://'):
+        return match.group(0)
+
+    # Resolve the image path relative to the markdown file's directory
+    if src.startswith('/'):
+        img_path = src
+    else:
+        img_path = os.path.join(base_dir, src)
+
+    # Check if file exists
+    if not os.path.exists(img_path):
+        print(f"Warning: Image not found: {img_path}", file=sys.stderr)
+        return match.group(0)
+
+    # Determine MIME type
+    ext = os.path.splitext(img_path)[1].lower()
+    mime_types = {
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+        '.webp': 'image/webp',
+        '.bmp': 'image/bmp'
+    }
+    mime_type = mime_types.get(ext, 'application/octet-stream')
+
+    # Read and encode the image
+    try:
+        with open(img_path, 'rb') as img_file:
+            img_data = base64.b64encode(img_file.read()).decode('utf-8')
+        data_uri = f'data:{mime_type};base64,{img_data}'
+        # Return the full img tag with the data URI
+        return f'src="{data_uri}"'
+    except Exception as e:
+        print(f"Warning: Could not embed image {img_path}: {e}", file=sys.stderr)
+        return match.group(0)
+
+# Replace all img src attributes with base64 data URIs
+# Match src="..." or src='...'
+html_content = re.sub(r'src="([^"]+)"', img_to_base64, html_content)
+html_content = re.sub(r"src='([^']+)'", img_to_base64, html_content)
+
+# Write the modified HTML
+with open(html_file, 'w', encoding='utf-8') as f:
+    f.write(html_content)
+PYTHON_SCRIPT
+}
+
 # Convert using Chrome/Chromium headless
 convert_chrome() {
   local md_file="$1"
   local pdf_file="$2"
   local chrome_path="$3"
+
+  # Get the directory containing the markdown file for resolving relative image paths
+  local md_dir=$(dirname "$(cd "$(dirname "$md_file")" && pwd)/$(basename "$md_file")")
 
   # Create temporary HTML with GitHub-style CSS
   local html_file=$(mktemp).html
@@ -223,6 +304,28 @@ li + li {
   margin-top: 0.25em;
 }
 
+/* === IMAGE STYLES === */
+/* Images: max-width=100%, centered, with margin */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 16px auto;
+}
+
+/* Figure captions */
+figcaption, .caption {
+  text-align: center;
+  font-size: 0.9em;
+  color: #6a737d;
+  margin-top: 8px;
+}
+
+/* Images inside paragraphs */
+p img {
+  margin: 16px auto;
+}
+
 @media print {
   @page {
     margin: 2cm 1.5cm;
@@ -292,6 +395,26 @@ li + li {
   pre code {
     page-break-inside: avoid;
   }
+
+  /* === IMAGE PRINT STYLES === */
+  /* Images: preserve colors, avoid page breaks inside figures */
+  img {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+    max-width: 100%;
+    page-break-inside: avoid;
+  }
+
+  /* Keep images with their captions */
+  figure {
+    page-break-inside: avoid;
+  }
+
+  /* Avoid breaking right after a heading that precedes an image */
+  h1 + p > img, h2 + p > img, h3 + p > img {
+    page-break-before: avoid;
+  }
 }
 CSS_STYLES
 
@@ -306,12 +429,18 @@ CSS_STYLES
 }
 HIGHLIGHT_ADJUST
 
+  # Convert markdown to HTML with resource path for images
   pandoc "$md_file" -t html -s \
+    --resource-path="$md_dir" \
     --css="$highlight_file" \
     --css="$css_file" \
     -o "$html_file" 2>/dev/null
 
   if [ $? -eq 0 ]; then
+    # Embed images as base64 data URIs for Chrome headless compatibility
+    # This ensures images are included in the PDF regardless of file:// restrictions
+    embed_images_as_base64 "$html_file" "$md_dir"
+
     # Generate PDF with Chrome headless
     # Flags for more deterministic output (reduces timestamp variations)
     "$chrome_path" --headless --disable-gpu --no-pdf-header-footer \
@@ -332,13 +461,20 @@ convert_typst() {
   local md_file="$1"
   local pdf_file="$2"
 
+  # Get the directory containing the markdown file for resolving relative image paths
+  local md_dir=$(dirname "$(cd "$(dirname "$md_file")" && pwd)/$(basename "$md_file")")
+
   # Convert markdown to Typst format
   local typ_file=$(mktemp).typ
 
-  pandoc "$md_file" -t typst -s -o "$typ_file" 2>/dev/null
+  # Use resource-path to find images relative to the markdown file
+  pandoc "$md_file" -t typst -s \
+    --resource-path="$md_dir" \
+    -o "$typ_file" 2>/dev/null
 
   if [ $? -eq 0 ]; then
-    typst compile "$typ_file" "$pdf_file" 2>/dev/null
+    # Compile Typst with the markdown directory as root for image resolution
+    typst compile --root "$md_dir" "$typ_file" "$pdf_file" 2>/dev/null
     local result=$?
     rm "$typ_file"
     return $result
@@ -352,6 +488,9 @@ convert_typst() {
 convert_tex() {
   local md_file="$1"
   local pdf_file="$2"
+
+  # Get the directory containing the markdown file for resolving relative image paths
+  local md_dir=$(dirname "$(cd "$(dirname "$md_file")" && pwd)/$(basename "$md_file")")
 
   # Create temporary header file for LaTeX table styling
   local header_file=$(mktemp)
@@ -470,7 +609,9 @@ convert_tex() {
 \setlength\LTright{0pt}
 LATEX_HEADER
 
+  # Use resource-path to find images relative to the markdown file
   pandoc -s "$md_file" \
+    --resource-path="$md_dir" \
     --pdf-engine="/Library/TeX/texbin/xelatex" \
     -H "$header_file" \
     -V geometry:"top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm" \
